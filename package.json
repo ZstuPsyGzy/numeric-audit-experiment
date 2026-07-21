@@ -1,0 +1,15 @@
+{
+  "name": "numeric-audit-online-experiment",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "check-plan": "node public/js/trial-plan.js",
+    "check-experiment": "node scripts/check-experiment.mjs && node scripts/check-counterbalancing.mjs",
+    "check-counterbalancing": "node scripts/check-counterbalancing.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -1,0 +1,27 @@
+name: Validate experiment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate trial plan and counterbalancing
+        run: npm run check-experiment
+
+      - name: Build deployment image
+        run: docker build -t numeric-audit-experiment:check .

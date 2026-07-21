@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实验结构配置器</title>
+  <link rel="stylesheet" href="/planner.css">
+</head>
+<body>
+  <header class="planner-header">
+    <div>
+      <p>数字关系核查实验</p>
+      <h1>实验结构配置器</h1>
+    </div>
+    <div class="header-actions">
+      <span id="saveState" class="save-state">草案已保存在当前浏览器</span>
+      <button id="copyConfig" class="primary-button" type="button">复制当前配置</button>
+    </div>
+  </header>
+
+  <main class="planner-layout">
+    <aside class="control-panel" aria-label="实验参数">
+      <section class="control-section">
+        <h2>设计结构</h2>
+        <label>AI 组合分配
+          <select id="aiAssignment">
+            <option value="within">被试内：每人完成四种 AI 组合</option>
+            <option value="between">组间：每人只完成一种 AI 组合</option>
+          </select>
+        </label>
+        <div class="level-group">
+          <span>AI1 可靠性水平</span>
+          <label><input type="checkbox" name="ai1Level" value="0.7" checked>70%</label>
+          <label><input type="checkbox" name="ai1Level" value="0.9" checked>90%</label>
+        </div>
+        <div class="level-group">
+          <span>AI2 可靠性水平</span>
+          <label><input type="checkbox" name="ai2Level" value="0.7" checked>70%</label>
+          <label><input type="checkbox" name="ai2Level" value="0.9" checked>90%</label>
+        </div>
+        <div class="level-group">
+          <span>Set size（有效核查位置）</span>
+          <label><input type="checkbox" name="setSize" value="3" checked>3×3</label>
+          <label><input type="checkbox" name="setSize" value="5" checked>5×5</label>
+          <label><input type="checkbox" name="setSize" value="7" checked>7×7</label>
+        </div>
+        <label>每个 cell 的 trial 数
+          <input id="trialsPerCell" type="number" min="10" max="200" step="10" value="20">
+        </label>
+        <label>有目标 trial 比例
+          <select id="targetRate">
+            <option value="0.5">50%（1:1）</option>
+            <option value="0.4">40%（2:3）</option>
+            <option value="0.2">20%（1:4）</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="control-section">
+        <h2>AI 生成规则</h2>
+        <label>可靠性操作定义
+          <select id="reliabilityDefinition">
+            <option value="trial_accuracy">Trial-level accuracy</option>
+            <option value="cue_validity">Cue-level validity</option>
+          </select>
+        </label>
+        <label>AI 错误分配
+          <select id="errorAllocation">
+            <option value="balanced">有目标错误 / 无目标虚惊各一半</option>
+            <option value="false_alarm_only">错误只来自无目标 trial 的虚惊</option>
+          </select>
+        </label>
+        <label class="toggle-row">
+          <input id="noSystemMiss" type="checkbox" checked>
+          <span>禁止两个 AI 同时漏掉真实目标</span>
+        </label>
+        <p class="control-note">AI1 使用深红提示，AI2 使用浅红提示；两者可提示同一位置。</p>
+      </section>
+
+      <section class="control-section">
+        <h2>Trial 与测量</h2>
+        <label class="toggle-row"><input id="optionalClick" type="checkbox" checked><span>允许点击数字作可选位置标记</span></label>
+        <label class="toggle-row"><input id="confidenceRating" type="checkbox" checked><span>每 trial 判断置信度</span></label>
+        <label class="toggle-row"><input id="ai1Trust" type="checkbox" checked><span>每 trial AI1 信任度</span></label>
+        <label class="toggle-row"><input id="ai2Trust" type="checkbox" checked><span>每 trial AI2 信任度</span></label>
+        <label>练习 trial 总数
+          <input id="practiceTrials" type="number" min="0" max="60" step="2" value="12">
+        </label>
+        <label>平均审核判断时间（秒）
+          <input id="decisionSeconds" type="number" min="1" max="60" step="1" value="8">
+        </label>
+        <label>每道评分预计时间（秒）
+          <input id="ratingSeconds" type="number" min="0" max="15" step="0.5" value="2">
+        </label>
+      </section>
+
+      <section class="control-section">
+        <h2>Block 与休息</h2>
+        <label>Block 嵌套方式
+          <select id="blockOrder">
+            <option value="ai_set">AI 组合 → Set size → Trial</option>
+            <option value="set_ai">Set size → AI 组合 → Trial</option>
+            <option value="mixed">所有 cell 混合随机</option>
+          </select>
+        </label>
+        <label>每多少 trial 休息
+          <input id="breakEvery" type="number" min="10" max="200" step="10" value="40">
+        </label>
+        <label>每次休息预计（秒）
+          <input id="breakSeconds" type="number" min="0" max="300" step="15" value="60">
+        </label>
+      </section>
+    </aside>
+
+    <section class="result-panel">
+      <div class="summary-grid" aria-label="实验规模汇总">
+        <article class="summary-card"><span>每名被试正式 trial</span><strong id="participantTrials">240</strong><small id="participantTrialNote">12 cells × 20</small></article>
+        <article class="summary-card"><span>预计单人时长</span><strong id="estimatedMinutes">64 min</strong><small id="timeNote">含练习、评分与休息</small></article>
+        <article class="summary-card"><span>设计条件</span><strong id="designCells">12 cells</strong><small id="groupNote">每人完成全部条件</small></article>
+      </div>
+
+      <section id="validationPanel" class="validation-panel" aria-live="polite"></section>
+
+      <section class="structure-section">
+        <div class="section-title">
+          <div><p>实时结构</p><h2>被试流程</h2></div>
+          <span id="structureLabel">被试内 · AI → Set size</span>
+        </div>
+        <div id="studyFlow" class="study-flow"></div>
+        <div id="trialFlow" class="trial-flow"></div>
+      </section>
+
+      <section class="condition-section">
+        <div class="section-title">
+          <div><p>条件检查</p><h2>AI 组合 × Set size</h2></div>
+          <span>数字为每个 cell 的精确计数</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>AI1 / AI2</th>
+                <th>Set size</th>
+                <th>Trials</th>
+                <th>有目标 / 无目标</th>
+                <th>AI1 正确</th>
+                <th>AI2 正确</th>
+                <th>可精确生成</th>
+              </tr>
+            </thead>
+            <tbody id="conditionRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="structure-section">
+        <div class="section-title">
+          <div><p>数据结果</p><h2>当前因变量</h2></div>
+        </div>
+        <div id="dependentVariables" class="variable-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="/planner.js"></script>
+</body>
+</html>
+
