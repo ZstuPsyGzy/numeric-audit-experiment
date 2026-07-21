@@ -77,9 +77,14 @@ docker run --rm -p 8780:8780 \
 
 ## GitHub 发布
 
-当前推荐使用 **GitHub 私有仓库 + Railway Service + Railway Volume**。GitHub 保存代码和版本，Railway 运行 Node.js 服务并保存实验数据；不要仅使用 GitHub Pages 开展正式收数。
+仓库支持两种发布方式：
+
+1. **GitHub Pages + 被试手动发送数据文件**：`docs/` 中的静态版本在实验结束后生成完整 JSON 和 CSV，不自动上传数据。
+2. **GitHub + Railway 自动收数**：Railway 运行 Node.js 服务并把实验数据保存到持久化磁盘。
 
 仓库已包含 GitHub Actions 校验：每次推送都会检查 300 个正式 trial、48 组顺序平衡，并构建一次 Docker 镜像。完整发布步骤见 [`GITHUB_RAILWAY_DEPLOY.md`](./GITHUB_RAILWAY_DEPLOY.md)。
+
+当前选择的是第一种方案。操作与回收要求见 [`GITHUB_PAGES_MANUAL_EXPORT.md`](./GITHUB_PAGES_MANUAL_EXPORT.md)。
 
 ## 主要文件
 
