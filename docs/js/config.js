@@ -1,6 +1,6 @@
-export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.2";
+export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.3";
 export const MATERIAL_SEED = "numeric-audit-material-v3-no-cue-overlap-fixed-for-all-participants";
-export const CUE_VISUAL_STYLE = "cell_background_tint_v3_deeper";
+export const CUE_VISUAL_STYLE = "cell_background_tint_v4_manual_b93f4a_e6a0a8";
 export const SET_SIZES = [3, 5, 7];
 export const MATRIX_GAP_MM = 1.5;
 export const TRIALS_PER_CELL = 20;
