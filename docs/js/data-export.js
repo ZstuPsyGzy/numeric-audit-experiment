@@ -32,12 +32,32 @@ function escapeCsv(value) {
 function rowsToCsv(rows) {
   const preferred = [
     "subject_code", "session_id", "experiment_version", "mode", "phase",
-    "condition_key", "set_size", "target_count", "target_present",
+    "condition_key", "matrix_id", "canonical_id", "material_seed",
+    "calibration_method", "calibration_reference",
+    "calibration_reference_width_mm", "calibration_reference_height_mm",
+    "calibration_reference_width_px", "px_per_mm",
+    "red_discrimination_correct", "gray_bands_distinguishable",
+    "set_size", "target_count", "target_present",
     "trial_index_global", "trial_index_block", "trial_uuid",
-    "judgment_response", "judgment_correct", "fully_correct",
-    "localization_rt_ms", "judgment_rt_ms", "confidence_rating",
-    "ai_trust_rating", "deep_validity", "light_validity",
-    "deep_outcome", "light_outcome", "selected_positions", "target_positions"
+    "participant_judgment", "correct_judgment", "judgment_correct", "fully_correct",
+    "localization_rt_ms", "judgment_rt_ms", "judgment_confidence",
+    "ai_output_trust", "deep_cue_trust", "light_cue_trust", "deep_validity", "light_validity",
+    "deep_outcome", "light_outcome", "selected_positions", "target_positions",
+    "matrix_rendered_width_px", "matrix_rendered_height_px",
+    "matrix_rendered_width_mm", "matrix_rendered_height_mm",
+    "cell_rendered_width_px", "cell_rendered_height_px",
+    "matrix_gap_requested_mm", "matrix_column_gap_px", "matrix_row_gap_px",
+    "matrix_column_gap_mm", "matrix_row_gap_mm", "digit_font_size_px",
+    "questionnaire_id", "scale_name", "scale_version", "questionnaire_order",
+    "item_count", "missing_count", "responses",
+    "bfi_01", "bfi_02", "bfi_03", "bfi_04", "bfi_05",
+    "bfi_06", "bfi_07", "bfi_08", "bfi_09", "bfi_10",
+    "bfi_extraversion_mean", "bfi_agreeableness_mean", "bfi_conscientiousness_mean",
+    "bfi_neuroticism_mean", "bfi_openness_mean",
+    "ail_01", "ail_02", "ail_03", "ail_04", "ail_05", "ail_06",
+    "ail_07", "ail_08", "ail_09", "ail_10", "ail_11", "ail_12",
+    "ai_literacy_awareness_mean", "ai_literacy_usage_mean", "ai_literacy_evaluation_mean",
+    "ai_literacy_ethics_mean", "ai_literacy_total_mean"
   ];
   const allKeys = new Set(rows.flatMap(row => Object.keys(row)));
   const headers = [

@@ -1,5 +1,5 @@
 .DS_Store
+node_modules/
 data/*.sqlite3
 data/*.sqlite3-*
 .env
-

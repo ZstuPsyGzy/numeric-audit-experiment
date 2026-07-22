@@ -15,8 +15,7 @@ export const SET_SIZE_ORDERS = [
 ];
 
 export const PHASE_ORDERS = [
-  ["baseline", "ai"],
-  ["ai", "baseline"]
+  ["baseline", "ai"]
 ];
 
 export const ASSIGNMENT_GROUPS_PER_CYCLE =

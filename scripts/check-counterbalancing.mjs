@@ -70,7 +70,7 @@ const tupleCounts = countBy(assignments, assignment => [
   assignment.set_size_order_index
 ].join("-"));
 if (tupleCounts.size !== ASSIGNMENT_GROUPS_PER_CYCLE) {
-  errors.push(`48组全交叉失败：只有 ${tupleCounts.size} 个唯一组合`);
+  errors.push(`${ASSIGNMENT_GROUPS_PER_CYCLE}组全交叉失败：只有 ${tupleCounts.size} 个唯一组合`);
 }
 for (const [tuple, count] of tupleCounts) {
   if (count !== 1) errors.push(`顺序组合 ${tuple} 出现 ${count} 次`);
@@ -80,19 +80,19 @@ requireUniform(
   "阶段顺序",
   countBy(assignments, assignment => assignment.phase_order_index),
   PHASE_ORDERS.map((_, index) => index + 1),
-  24
+  ASSIGNMENT_GROUPS_PER_CYCLE / PHASE_ORDERS.length
 );
 requireUniform(
   "AI condition顺序",
   countBy(assignments, assignment => assignment.condition_order_index),
   CONDITION_ORDERS.map((_, index) => index + 1),
-  12
+  ASSIGNMENT_GROUPS_PER_CYCLE / CONDITION_ORDERS.length
 );
 requireUniform(
   "set size顺序",
   countBy(assignments, assignment => assignment.set_size_order_index),
   SET_SIZE_ORDERS.map((_, index) => index + 1),
-  8
+  ASSIGNMENT_GROUPS_PER_CYCLE / SET_SIZE_ORDERS.length
 );
 
 console.table(assignments.map(assignment => ({
@@ -108,6 +108,7 @@ if (errors.length) {
   console.error(errors);
   process.exitCode = 1;
 } else {
-  console.log("\nPASS: P001-P048 form one complete 2 x 4 x 6 counterbalancing cycle.");
+  console.log("\nPASS: P001-P024 form one complete fixed-phase 1 x 4 x 6 counterbalancing cycle.");
+  console.log("PASS: every participant completes baseline before AI.");
   console.log("PASS: AI conditions and set sizes are position-balanced and first-order carryover-balanced.");
 }

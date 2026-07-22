@@ -286,12 +286,13 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .matrix-wrap { min-height: 0; display: grid; place-items: center; padding: 10px; }
 .number-matrix {
   --matrix-size: 5;
+  --matrix-gap: 6px;
   width: min(60vh, 560px, 95%);
   aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(var(--matrix-size), minmax(0, 1fr));
   grid-template-rows: repeat(var(--matrix-size), minmax(0, 1fr));
-  gap: clamp(4px, .65vh, 8px);
+  gap: var(--matrix-gap);
 }
 .number-matrix.matrix-size-5 { --matrix-size: 5; }
 .number-matrix.matrix-size-7 { --matrix-size: 7; }
@@ -382,6 +383,57 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .completion-screen section { width: min(540px, 100%); padding: 42px; border: 1px solid var(--line); background: #fff; text-align: center; }
 .completion-screen h1 { margin: 0 0 14px; font-size: 28px; }
 .completion-screen p { margin: 0 0 20px; color: var(--muted); line-height: 1.7; }
+
+.calibration-panel { width: min(860px, 100%); }
+.calibration-heading { margin-bottom: 18px; }
+.calibration-heading span { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+.calibration-heading h1 { margin: 0; }
+.calibration-stage > p { margin: 0; color: var(--muted); line-height: 1.7; }
+.reference-card { margin: 24px auto; border: 2px solid #252a2e; border-radius: 8px; background: #f4f5f6; box-shadow: inset 0 0 0 1px #fff; }
+.calibration-slider-label { width: min(600px, 100%); display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: center; margin: 0 auto; }
+.calibration-slider-label input { width: 100%; }
+.calibration-value { margin: 8px 0 0; color: var(--muted); text-align: center; }
+.red-check, .gray-check { padding: 18px; border: 1px solid var(--line); background: #fafafa; }
+.red-check { margin: 20px 0 14px; }
+.red-check h2, .gray-check h2 { margin: 0 0 14px; font-size: 17px; }
+.red-swatch-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.red-choice { min-height: 92px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px; border: 1px solid #b8c0c7; border-radius: 4px; background: #fff; }
+.red-choice.selected, .binary-check button.selected { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.red-swatch { height: 58px; border-radius: 4px; }
+.red-swatch.deep { background: var(--deep-red); }
+.red-swatch.light { background: var(--light-red); }
+.calibration-feedback { min-height: 20px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+.gray-bands { height: 54px; display: grid; grid-template-columns: repeat(8, 1fr); border: 1px solid #8b9298; }
+.gray-bands i { display: block; }
+.gray-check > p { margin: 12px 0 8px; color: var(--muted); }
+.binary-check { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.binary-check button { min-height: 42px; border: 1px solid #b8c0c7; border-radius: 4px; background: #fff; }
+.calibration-warning { margin-top: 13px; padding: 11px 13px; border-left: 3px solid var(--red); background: #fbf2f2; color: #672c2f; font-size: 11px; line-height: 1.6; }
+
+.questionnaire-screen { height: 100vh; min-height: 700px; padding: 18px; overflow: hidden; background: #eef0f2; }
+.questionnaire-panel { width: min(1120px, 100%); height: 100%; margin: 0 auto; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; border: 1px solid var(--line); background: #fff; }
+.questionnaire-panel > header { min-height: 72px; padding: 14px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+.questionnaire-panel > header p { margin: 0 0 4px; color: var(--blue); font-size: 11px; font-weight: 700; }
+.questionnaire-panel > header h1 { margin: 0; font-size: 23px; }
+.questionnaire-panel > header > span { color: var(--muted); font-size: 12px; }
+.questionnaire-description { padding: 12px 24px; border-bottom: 1px solid var(--line); background: #f8fafb; }
+.questionnaire-description p { margin: 0; color: #454d55; font-size: 12px; line-height: 1.65; }
+.questionnaire-scale-head { --option-count: 5; padding: 8px 24px; display: grid; grid-template-columns: minmax(360px, 1fr) repeat(var(--option-count), 68px); align-items: end; border-bottom: 1px solid var(--line); color: var(--muted); }
+.questionnaire-scale-label { padding: 0 2px; text-align: center; font-size: 9px; line-height: 1.25; }
+.questionnaire-items { min-height: 0; overflow-y: auto; padding: 0 24px; }
+.questionnaire-item { display: grid; grid-template-columns: minmax(360px, 1fr) auto; align-items: center; min-height: 64px; border-bottom: 1px solid #e3e7ea; }
+.questionnaire-item > p { margin: 0; padding: 10px 16px 10px 0; color: #30373d; font-size: 12px; line-height: 1.55; }
+.questionnaire-item > p > span { width: 24px; height: 24px; margin-right: 9px; display: inline-grid; place-items: center; border-radius: 50%; background: #e8eef2; color: #344955; font-size: 10px; font-weight: 700; }
+.questionnaire-options { display: grid; grid-template-columns: repeat(var(--option-count), 68px); }
+.questionnaire-options label { height: 54px; display: grid; place-items: center; cursor: pointer; }
+.questionnaire-options input { position: absolute; opacity: 0; pointer-events: none; }
+.questionnaire-options span { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #aeb8bf; border-radius: 50%; background: #fff; color: #47515a; font-size: 11px; font-weight: 700; }
+.questionnaire-options label:hover span { border-color: var(--blue); }
+.questionnaire-options input:focus-visible + span { outline: 3px solid #9fc4dd; outline-offset: 2px; }
+.questionnaire-options input:checked + span { border-color: var(--blue); background: var(--blue); color: #fff; }
+.questionnaire-panel > footer { min-height: 64px; padding: 10px 24px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; align-items: center; gap: 20px; }
+.questionnaire-panel > footer .primary-button { min-width: 150px; }
+.questionnaire-error { flex: 1; margin: 0; color: var(--red); font-size: 11px; text-align: right; }
 
 @media (max-width: 1050px) {
   .trial-header { grid-template-columns: 1fr minmax(350px, 420px); }

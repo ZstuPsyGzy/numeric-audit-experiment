@@ -1,6 +1,7 @@
-export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.5.1";
+export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.8.0";
 export const MATERIAL_SEED = "numeric-audit-material-v2-fixed-for-all-participants";
 export const SET_SIZES = [3, 5, 7];
+export const MATRIX_GAP_MM = 1.5;
 export const TRIALS_PER_CELL = 20;
 export const TARGET_COUNTS_PER_CELL = { 0: 10, 1: 6, 2: 4 };
 export const PILOT_TRIALS_PER_BLOCK = 2;

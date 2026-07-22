@@ -1,3 +1,5 @@
+import { MATRIX_GAP_MM } from "./config.js";
+
 const { ParameterType } = window.jsPsychModule;
 
 function keyOf(position) {
@@ -129,6 +131,9 @@ export class NumericAuditPlugin {
     const reviewButton = displayElement.querySelector("[data-review-instructions]");
     const instructionOverlay = displayElement.querySelector("[data-instruction-overlay]");
     const closeInstructionsButton = displayElement.querySelector("[data-close-instructions]");
+    const pxPerMm = Number(window.__displayCalibration?.px_per_mm) || null;
+    const requestedGapPx = pxPerMm ? MATRIX_GAP_MM * pxPerMm : 6;
+    matrixElement.style.setProperty("--matrix-gap", `${round(requestedGapPx)}px`);
 
     if (reviewButton && instructionOverlay && closeInstructionsButton) {
       reviewButton.addEventListener("click", () => {
@@ -189,6 +194,37 @@ export class NumericAuditPlugin {
       matrixElement.append(button);
     }));
 
+    const matrixRect = matrixElement.getBoundingClientRect();
+    const sampleCell = matrixElement.querySelector(".number-cell");
+    const cellRect = sampleCell?.getBoundingClientRect();
+    const deepCueRect = matrixElement.querySelector(".cue-ring.deep")?.getBoundingClientRect();
+    const lightCueRect = matrixElement.querySelector(".cue-ring.light")?.getBoundingClientRect();
+    const matrixStyle = getComputedStyle(matrixElement);
+    const columnGapPx = Number.parseFloat(matrixStyle.columnGap);
+    const rowGapPx = Number.parseFloat(matrixStyle.rowGap);
+    const toMm = value => pxPerMm ? round(value / pxPerMm) : null;
+    const displayMetrics = {
+      matrix_rendered_width_px: round(matrixRect.width),
+      matrix_rendered_height_px: round(matrixRect.height),
+      matrix_rendered_width_mm: toMm(matrixRect.width),
+      matrix_rendered_height_mm: toMm(matrixRect.height),
+      cell_rendered_width_px: cellRect ? round(cellRect.width) : null,
+      cell_rendered_height_px: cellRect ? round(cellRect.height) : null,
+      cell_rendered_width_mm: cellRect ? toMm(cellRect.width) : null,
+      cell_rendered_height_mm: cellRect ? toMm(cellRect.height) : null,
+      matrix_gap_requested_mm: MATRIX_GAP_MM,
+      matrix_column_gap_px: Number.isFinite(columnGapPx) ? round(columnGapPx) : null,
+      matrix_row_gap_px: Number.isFinite(rowGapPx) ? round(rowGapPx) : null,
+      matrix_column_gap_mm: Number.isFinite(columnGapPx) ? toMm(columnGapPx) : null,
+      matrix_row_gap_mm: Number.isFinite(rowGapPx) ? toMm(rowGapPx) : null,
+      digit_font_size_px: sampleCell ? round(Number.parseFloat(getComputedStyle(sampleCell).fontSize)) : null,
+      deep_cue_rendered_width_px: deepCueRect ? round(deepCueRect.width) : null,
+      light_cue_rendered_width_px: lightCueRect ? round(lightCueRect.width) : null,
+      display_calibration_px_per_mm: pxPerMm,
+      display_red_discrimination_correct: window.__displayCalibration?.red_discrimination_correct ?? null,
+      display_gray_bands_distinguishable: window.__displayCalibration?.gray_bands_distinguishable ?? null
+    };
+
     const finish = (responseEndedAt = activeElapsed()) => {
       const endedAt = responseEndedAt;
       const selectedPositions = [...selected.values()];
@@ -205,6 +241,7 @@ export class NumericAuditPlugin {
         trial_kind: "numeric_audit",
         practice: trial.practice,
         canonical_id: spec.canonical_id,
+        matrix_id: spec.matrix_id,
         phase: spec.phase,
         condition_key: spec.condition_key,
         trial_index_global: spec.trial_index_global ?? null,
@@ -227,6 +264,7 @@ export class NumericAuditPlugin {
         system_event: spec.system_event,
         system_correct: spec.system_correct,
         matrix: material.matrix,
+        ...displayMetrics,
         participant_judgment: judgment,
         correct_judgment: spec.correct_judgment,
         judgment_correct: judgmentCorrect,

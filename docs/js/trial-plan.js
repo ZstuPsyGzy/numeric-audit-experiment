@@ -52,6 +52,10 @@ function repeat(value, count) {
   return Array.from({ length: count }, () => value);
 }
 
+function matrixId(conditionKey, setSize, index) {
+  return `matrix-${conditionKey}-s${setSize}-m${String(index + 1).padStart(2, "0")}`;
+}
+
 function longestRun(items, getter) {
   let longest = 0;
   let current = 0;
@@ -107,6 +111,7 @@ function makeBaselineCell(setSize) {
   );
   return constrainedShuffle(states, rng).map((state, index) => ({
     canonical_id: `baseline-s${setSize}-t${String(index + 1).padStart(2, "0")}`,
+    matrix_id: matrixId("baseline", setSize, index),
     phase: "baseline",
     condition_key: BASELINE_CONDITION.key,
     ai_present: false,
@@ -148,6 +153,7 @@ function makeAiCell(conditionKey, setSize) {
 
   return constrainedShuffle(states, rng).map((state, index) => ({
     canonical_id: `${conditionKey}-s${setSize}-t${String(index + 1).padStart(2, "0")}`,
+    matrix_id: matrixId(conditionKey, setSize, index),
     phase: "ai",
     condition_key: conditionKey,
     ai_present: true,
@@ -217,6 +223,9 @@ export function validateTrialPlan(plan = generateCanonicalPlan()) {
   const summary = [];
   const expectedTotal = (1 + Object.keys(AI_CONDITIONS).length) * SET_SIZES.length * TRIALS_PER_CELL;
   if (plan.length !== expectedTotal) errors.push(`总 trial 数应为 ${expectedTotal}，实际为 ${plan.length}`);
+  const matrixIds = plan.map(trial => trial.matrix_id);
+  if (matrixIds.some(id => typeof id !== "string" || !id)) errors.push("存在缺失的 matrix_id");
+  if (new Set(matrixIds).size !== plan.length) errors.push("正式 trial 的 matrix_id 不是全局唯一");
 
   for (const conditionKey of ["baseline", ...Object.keys(AI_CONDITIONS)]) {
     for (const setSize of SET_SIZES) {
