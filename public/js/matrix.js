@@ -94,10 +94,6 @@ function makeCues(spec, targetPositions, distractors) {
       deepCue = distractors[0];
       lightCue = distractors[1];
       break;
-    case "both_valid_overlap":
-      deepCue = targetPositions[0];
-      lightCue = targetPositions[0];
-      break;
     case "both_valid_split":
       deepCue = targetPositions[0];
       lightCue = targetPositions[1];
@@ -130,6 +126,9 @@ export function generateTrialMaterial(spec) {
   const generated = generateNumberMatrix(spec.set_size, spec.target_count, rng);
   const distractors = chooseDistractors(spec.set_size, generated.targetPositions, 2, rng);
   const cues = makeCues(spec, generated.targetPositions, distractors);
+  if (samePosition(cues.deepCue, cues.lightCue)) {
+    throw new Error(`cue 位置不得重合: ${spec.canonical_id}`);
+  }
   return {
     ...generated,
     ...cues,
@@ -150,6 +149,7 @@ export function verifyMaterial(spec, material) {
     && invalid.every(position => expectedKeys.has(positionKey(position)));
   const deepOutcome = cueOutcome(material.deepCue, material.targetPositions);
   const lightOutcome = cueOutcome(material.lightCue, material.targetPositions);
+  const cuePositionsOverlap = samePosition(material.deepCue, material.lightCue);
   const coveredKeys = new Set(
     [material.deepCue, material.lightCue]
       .filter(cue => cue && expectedKeys.has(positionKey(cue)))
@@ -169,13 +169,14 @@ export function verifyMaterial(spec, material) {
           : false
   );
   return {
-    valid: matrixCorrect && cuesCorrect && systemCorrect,
+    valid: matrixCorrect && cuesCorrect && systemCorrect && !cuePositionsOverlap,
     invalid,
     matrixCorrect,
     cuesCorrect,
     targetCoverageComplete,
     systemCorrect,
     deepOutcome,
-    lightOutcome
+    lightOutcome,
+    cuePositionsOverlap
   };
 }

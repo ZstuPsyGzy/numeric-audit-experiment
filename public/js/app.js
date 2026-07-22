@@ -209,7 +209,7 @@ function aiInstructionContent() {
     <section class="ai-explanation-list">
       <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>深红候选</strong><br>模型认为最值得优先核查的位置。</p></div>
       <div class="cue-explanation"><i class="cue-key light"></i><p><strong>浅红候选</strong><br>模型认为也值得核查的位置。</p></div>
-      <div class="ai-boundary-note"><strong>请注意</strong><p>AI 只帮助安排核查顺序，不直接给出最终答案。候选可能正确，也可能把正常位置标出来；最终判断仍由你完成。</p></div>
+      <div class="ai-boundary-note"><strong>请注意</strong><p>深红和浅红候选不会指向同一个位置。AI 只帮助安排核查顺序，不直接给出最终答案；候选可能正确，也可能把正常位置标出来，最终判断仍由你完成。</p></div>
     </section>
   </div>`;
 }

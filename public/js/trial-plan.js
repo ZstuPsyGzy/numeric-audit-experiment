@@ -5,36 +5,33 @@ import {
   MATERIAL_SEED,
   PILOT_TRIALS_PER_BLOCK,
   SET_SIZES,
-  TARGET_COUNTS_PER_CELL,
+  TARGET_COUNTS_PER_CELL_BY_CONDITION,
   TRIALS_PER_CELL
 } from "./config.js";
 import { createRng, shuffle } from "./rng.js";
 
 const AI_PROFILES = {
   "90_90": {
-    target1: [
-      ...repeat("both_valid_overlap", 4),
-      ...repeat("deep_valid_only", 1),
-      ...repeat("light_valid_only", 1)
-    ],
+    target1: ["deep_valid_only", "light_valid_only"],
+    target2: repeat("both_valid_split", 8),
     target0: [...repeat("correct_rejection", 8), "deep_false_alarm", "light_false_alarm"]
   },
   "90_70": {
     target1: [
-      ...repeat("both_valid_overlap", 2),
-      "deep_valid_light_invalid",
       ...repeat("deep_valid_only", 2),
+      "deep_valid_light_invalid",
       "light_valid_only"
     ],
+    target2: repeat("both_valid_split", 6),
     target0: [...repeat("correct_rejection", 8), "both_false_alarm", "light_false_alarm"]
   },
   "70_90": {
     target1: [
-      ...repeat("both_valid_overlap", 2),
-      "deep_invalid_light_valid",
       ...repeat("light_valid_only", 2),
+      "deep_invalid_light_valid",
       "deep_valid_only"
     ],
+    target2: repeat("both_valid_split", 6),
     target0: [...repeat("correct_rejection", 8), "both_false_alarm", "deep_false_alarm"]
   },
   "70_70": {
@@ -44,6 +41,7 @@ const AI_PROFILES = {
       "deep_invalid_light_valid",
       ...repeat("light_valid_only", 2)
     ],
+    target2: repeat("both_valid_split", 4),
     target0: [...repeat("correct_rejection", 8), ...repeat("both_false_alarm", 2)]
   }
 };
@@ -91,7 +89,7 @@ function cueOutcomes(profile, targetCount) {
   if (profile === "deep_false_alarm") return { deep: "invalid", light: "absent" };
   if (profile === "light_false_alarm") return { deep: "absent", light: "invalid" };
   if (profile === "both_false_alarm") return { deep: "invalid", light: "invalid" };
-  if (profile === "both_valid_overlap" || profile === "both_valid_split") return { deep: "valid", light: "valid" };
+  if (profile === "both_valid_split") return { deep: "valid", light: "valid" };
   if (profile === "deep_valid_only") return { deep: "valid", light: "absent" };
   if (profile === "light_valid_only") return { deep: "absent", light: "valid" };
   if (profile === "deep_valid_light_invalid") return { deep: "valid", light: "invalid" };
@@ -106,7 +104,7 @@ function systemEvent(targetCount, profile) {
 
 function makeBaselineCell(setSize) {
   const rng = createRng(`${MATERIAL_SEED}:plan:baseline:${setSize}`);
-  const states = Object.entries(TARGET_COUNTS_PER_CELL).flatMap(([count, n]) =>
+  const states = Object.entries(TARGET_COUNTS_PER_CELL_BY_CONDITION.baseline).flatMap(([count, n]) =>
     repeat(Number(count), n).map(targetCount => ({ target_count: targetCount }))
   );
   return constrainedShuffle(states, rng).map((state, index) => ({
@@ -140,7 +138,7 @@ function makeAiCell(conditionKey, setSize) {
   const states = [
     ...profiles.target0.map(cue_profile => ({ target_count: 0, cue_profile })),
     ...profiles.target1.map(cue_profile => ({ target_count: 1, cue_profile })),
-    ...repeat("both_valid_split", TARGET_COUNTS_PER_CELL[2]).map(cue_profile => ({ target_count: 2, cue_profile }))
+    ...profiles.target2.map(cue_profile => ({ target_count: 2, cue_profile }))
   ].map(state => {
     const outcomes = cueOutcomes(state.cue_profile, state.target_count);
     return {
@@ -259,8 +257,9 @@ export function validateTrialPlan(plan = generateCanonicalPlan()) {
       summary.push(row);
 
       if (cell.length !== TRIALS_PER_CELL) errors.push(`${conditionKey}/S${setSize}: trial 数不是 20`);
-      if (target0 !== 10 || target1 !== 6 || target2 !== 4) {
-        errors.push(`${conditionKey}/S${setSize}: 目标数分布不是 10/6/4`);
+      const expectedTargets = TARGET_COUNTS_PER_CELL_BY_CONDITION[conditionKey];
+      if (target0 !== expectedTargets[0] || target1 !== expectedTargets[1] || target2 !== expectedTargets[2]) {
+        errors.push(`${conditionKey}/S${setSize}: 目标数分布不是 ${expectedTargets[0]}/${expectedTargets[1]}/${expectedTargets[2]}`);
       }
       if (conditionKey === "baseline") {
         if (cell.some(trial => trial.ai_present || trial.system_event !== "none")) {
@@ -280,6 +279,9 @@ export function validateTrialPlan(plan = generateCanonicalPlan()) {
       }
       if (row.light_valid !== condition.light_validity * 10) {
         errors.push(`${conditionKey}/S${setSize}: 浅红 cue 有效数错误`);
+      }
+      if (cell.some(trial => trial.cue_profile === "both_valid_overlap")) {
+        errors.push(`${conditionKey}/S${setSize}: 存在禁止的同位置 cue profile`);
       }
     }
   }

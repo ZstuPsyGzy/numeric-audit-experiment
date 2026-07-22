@@ -258,6 +258,11 @@ export class NumericAuditPlugin {
         light_validity: spec.light_validity,
         deep_cue_position: material.deepCue,
         light_cue_position: material.lightCue,
+        cue_positions_overlap: Boolean(
+          material.deepCue
+          && material.lightCue
+          && keyOf(material.deepCue) === keyOf(material.lightCue)
+        ),
         deep_outcome: spec.deep_outcome,
         light_outcome: spec.light_outcome,
         cue_profile: spec.cue_profile,
