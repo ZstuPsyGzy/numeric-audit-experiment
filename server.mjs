@@ -19,7 +19,7 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "local-development-only";
 const SUBJECT_CODE_SALT = process.env.SUBJECT_CODE_SALT || "local-development-salt";
 const PUBLIC_ORIGIN = process.env.PUBLIC_ORIGIN || "";
 const MAX_BODY_BYTES = 1024 * 1024;
-const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.9.0";
+const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.0";
 
 mkdirSync(DATA_DIR, { recursive: true });
 const db = new DatabaseSync(join(DATA_DIR, "experiment.sqlite3"));

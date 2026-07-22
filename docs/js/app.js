@@ -203,15 +203,15 @@ function aiInstructionContent() {
   return `<div class="ai-instruction-layout">
     <section>
       <p class="instruction-lead">我们基于过往数字核查数据训练了一个 AI 模型。模型会分析矩阵中的位置，并提示最值得优先核查的候选。</p>
-      <div class="ai-cue-example" aria-label="AI 深红和浅红候选示意">
+      <div class="ai-cue-example" aria-label="AI 深红和浅红底纹候选示意">
         <span>6</span><span class="deep-candidate">8</span><span>7</span>
         <span>5</span><span>4</span><span class="light-candidate">6</span>
         <span>9</span><span>3</span><span>8</span>
       </div>
     </section>
     <section class="ai-explanation-list">
-      <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>深红候选</strong><br>模型认为最值得优先核查的位置。</p></div>
-      <div class="cue-explanation"><i class="cue-key light"></i><p><strong>浅红候选</strong><br>模型认为也值得核查的位置。</p></div>
+      <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>较深的淡红底纹</strong><br>模型认为最值得优先核查的位置。</p></div>
+      <div class="cue-explanation"><i class="cue-key light"></i><p><strong>较浅的淡红底纹</strong><br>模型认为也值得核查的位置。</p></div>
       <div class="ai-boundary-note"><strong>请注意</strong><p>深红和浅红候选不会指向同一个位置。AI 只帮助安排核查顺序，不直接给出最终答案；候选可能正确，也可能把正常位置标出来，最终判断仍由你完成。</p></div>
     </section>
   </div>`;

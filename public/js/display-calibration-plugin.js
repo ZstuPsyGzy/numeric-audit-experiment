@@ -58,7 +58,7 @@ export class DisplayCalibrationPlugin {
           </div>
 
           <div class="calibration-stage" data-color-stage hidden>
-            <p>请在当前屏幕亮度下完成颜色辨认。两块色块的面积完全相同，只比较颜色深浅。</p>
+            <p>请在当前屏幕亮度下辨认正式实验使用的两种淡红底纹。两块色块面积完全相同，只比较颜色深浅。</p>
             <section class="red-check" aria-labelledby="red-check-title">
               <h2 id="red-check-title">哪一块红色更深？</h2>
               <div class="red-swatch-options">

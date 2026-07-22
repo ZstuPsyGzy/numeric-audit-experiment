@@ -1,4 +1,4 @@
-import { MATRIX_GAP_MM } from "./config.js";
+import { CUE_VISUAL_STYLE, MATRIX_GAP_MM } from "./config.js";
 
 const { ParameterType } = window.jsPsychModule;
 
@@ -163,14 +163,10 @@ export class NumericAuditPlugin {
       button.dataset.col = colIndex;
       button.disabled = !selectable;
       if (spec.ai_present && material.deepCue?.row === rowIndex && material.deepCue?.col === colIndex) {
-        const ring = document.createElement("span");
-        ring.className = "cue-ring deep";
-        button.append(ring);
+        button.classList.add("cue-deep");
       }
       if (spec.ai_present && material.lightCue?.row === rowIndex && material.lightCue?.col === colIndex) {
-        const ring = document.createElement("span");
-        ring.className = "cue-ring light";
-        button.append(ring);
+        button.classList.add("cue-light");
       }
       if (selectable) button.addEventListener("click", () => {
         const position = { row: rowIndex, col: colIndex };
@@ -197,8 +193,8 @@ export class NumericAuditPlugin {
     const matrixRect = matrixElement.getBoundingClientRect();
     const sampleCell = matrixElement.querySelector(".number-cell");
     const cellRect = sampleCell?.getBoundingClientRect();
-    const deepCueRect = matrixElement.querySelector(".cue-ring.deep")?.getBoundingClientRect();
-    const lightCueRect = matrixElement.querySelector(".cue-ring.light")?.getBoundingClientRect();
+    const deepCueRect = matrixElement.querySelector(".number-cell.cue-deep")?.getBoundingClientRect();
+    const lightCueRect = matrixElement.querySelector(".number-cell.cue-light")?.getBoundingClientRect();
     const matrixStyle = getComputedStyle(matrixElement);
     const columnGapPx = Number.parseFloat(matrixStyle.columnGap);
     const rowGapPx = Number.parseFloat(matrixStyle.rowGap);
@@ -258,6 +254,7 @@ export class NumericAuditPlugin {
         light_validity: spec.light_validity,
         deep_cue_position: material.deepCue,
         light_cue_position: material.lightCue,
+        cue_visual_style: CUE_VISUAL_STYLE,
         cue_positions_overlap: Boolean(
           material.deepCue
           && material.lightCue
