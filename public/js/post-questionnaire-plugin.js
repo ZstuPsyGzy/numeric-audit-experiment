@@ -41,18 +41,22 @@ export class PostQuestionnairePlugin {
 
   trial(displayElement, trial) {
     const startedAt = performance.now();
-    const labels = trial.labels || [];
+    const labels = (trial.labels || []).map((label, index) => (
+      typeof label === "object"
+        ? { text: label.text, value: label.value ?? index + 1 }
+        : { text: label, value: index + 1 }
+    ));
     const questions = trial.questions || [];
     const scaleHeader = labels.map((label, index) => `
-      <span class="questionnaire-scale-label" style="grid-column:${index + 2}">${escapeHtml(label)}</span>`).join("");
+      <span class="questionnaire-scale-label" style="grid-column:${index + 2}">${escapeHtml(label.text)}</span>`).join("");
     const questionRows = questions.map((question, questionIndex) => `
       <div class="questionnaire-item" role="radiogroup" aria-labelledby="question-${questionIndex + 1}">
         <p id="question-${questionIndex + 1}"><span>${questionIndex + 1}</span>${escapeHtml(question.prompt)}</p>
         <div class="questionnaire-options" style="--option-count:${labels.length}">
-          ${labels.map((label, index) => `
-            <label title="${escapeHtml(label)}">
-              <input type="radio" name="${escapeHtml(question.name)}" value="${index + 1}" required>
-              <span>${index + 1}</span>
+          ${labels.map(label => `
+            <label title="${escapeHtml(label.text)}">
+              <input type="radio" name="${escapeHtml(question.name)}" value="${escapeHtml(label.value)}" required>
+              <span>${escapeHtml(label.value)}</span>
             </label>`).join("")}
         </div>
       </div>`).join("");

@@ -47,6 +47,18 @@ const AI_LITERACY_ITEMS = [
   { name: "ail_11", prompt: "使用人工智能应用或产品时，我从不警惕隐私和信息安全问题。" },
   { name: "ail_12", prompt: "我始终警惕人工智能技术被滥用。" }
 ];
+const NASA_TLX_ITEMS = [
+  { name: "tlx_mental", prompt: "心理需求：刚才这一组任务需要多少思考、注意和记忆投入？" },
+  { name: "tlx_physical", prompt: "身体需求：刚才这一组任务需要多少身体操作或身体负担？" },
+  { name: "tlx_temporal", prompt: "时间需求：刚才这一组任务让你感到多大的时间压力？" },
+  { name: "tlx_performance", prompt: "表现感受：你对自己刚才这一组任务的表现有多不满意？" },
+  { name: "tlx_effort", prompt: "努力程度：你为了完成刚才这一组任务投入了多少努力？" },
+  { name: "tlx_frustration", prompt: "挫败感：刚才这一组任务让你感到多大程度的烦躁、压力或受挫？" }
+];
+const AI_USEFULNESS_ITEM = {
+  name: "ai_usefulness",
+  prompt: "AI 有用性：刚才这一组任务中，AI 分析结果对完成核查有多大帮助？"
+};
 const consentScreen = document.querySelector("#consent-screen");
 const consentAdult = document.querySelector("#consent-adult");
 const consentRead = document.querySelector("#consent-read");
@@ -461,10 +473,18 @@ function scoreQuestionnaire(questionnaireId, responses) {
       ai_literacy_total_mean: mean(Object.values(scored))
     };
   }
+  if (questionnaireId === "block_nasa_tlx") {
+    const tlxValues = NASA_TLX_ITEMS
+      .map(item => responses[item.name])
+      .filter(value => Number.isFinite(value));
+    return {
+      nasa_tlx_raw_mean: tlxValues.length ? mean(tlxValues) : null
+    };
+  }
   return {};
 }
 
-function storeQuestionnaireData(data, assignment) {
+function storeQuestionnaireData(data, assignment, context = {}) {
   const responses = data.responses || {};
   const record = {
     ...data,
@@ -473,8 +493,13 @@ function storeQuestionnaireData(data, assignment) {
     trial_uuid: randomUuid(),
     experiment_version: EXPERIMENT_VERSION,
     mode,
-    phase: "post_questionnaire",
-    condition_key: data.questionnaire_id,
+    phase: context.phase || "post_questionnaire",
+    condition_key: context.condition_key || data.questionnaire_id,
+    block_index: context.block_index ?? null,
+    set_size: context.set_size ?? null,
+    block_trial_count: context.block_trial_count ?? null,
+    block_position: context.block_position ?? null,
+    block_count: context.block_count ?? null,
     assignment_group: assignment.assignment_group,
     assignment_cycle: assignment.assignment_cycle,
     allocation_method: assignment.allocation_method,
@@ -484,7 +509,7 @@ function storeQuestionnaireData(data, assignment) {
     phase_order: assignment.phase_order,
     condition_order: assignment.condition_order,
     set_size_order: assignment.set_size_order,
-    questionnaire_order: ["bfi10_zh", "ai_literacy_wang12_zh"],
+    questionnaire_order: context.questionnaire_order || ["bfi10_zh", "ai_literacy_wang12_zh"],
     hosting_platform: "github_pages",
     session_id: session.session_id,
     subject_code: session.subject_code,
@@ -503,6 +528,44 @@ function storeQuestionnaireData(data, assignment) {
   Object.assign(data, record);
   enqueueTrial(session.session_id, record);
   if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+}
+
+function blockWorkloadTimeline(block, assignment, blockPosition, blockCount) {
+  const spec = block[0];
+  const labels = [
+    { value: 0, text: "0 很低" },
+    { value: 20, text: "20" },
+    { value: 40, text: "40" },
+    { value: 60, text: "60" },
+    { value: 80, text: "80" },
+    { value: 100, text: "100 很高" }
+  ];
+  const questions = [
+    ...NASA_TLX_ITEMS,
+    ...(spec.ai_present ? [AI_USEFULNESS_ITEM] : [])
+  ];
+  return {
+    type: PostQuestionnairePlugin,
+    title: spec.ai_present ? "本组任务评价" : "本组任务负荷评价",
+    description: `<p>请根据刚刚完成的这一组 trial 作答。0 表示很低，100 表示很高。</p>${spec.ai_present ? "<p>最后一题只评价刚才这一组 AI 分析结果对你的帮助程度。</p>" : ""}`,
+    questionnaire_id: "block_nasa_tlx",
+    scale_name: "Raw NASA-TLX + AI usefulness",
+    scale_version: "Hart & Staveland 1988; raw six-dimension block rating",
+    progress_label: `区组评价 ${blockPosition + 1} / ${blockCount}`,
+    questions,
+    labels,
+    button_label: "提交评价，继续",
+    on_finish: data => storeQuestionnaireData(data, assignment, {
+      phase: "block_questionnaire",
+      condition_key: spec.condition_key,
+      block_index: spec.block_index,
+      set_size: spec.set_size,
+      block_trial_count: block.length,
+      block_position: blockPosition + 1,
+      block_count: blockCount,
+      questionnaire_order: ["block_nasa_tlx", "bfi10_zh", "ai_literacy_wang12_zh"]
+    })
+  };
 }
 
 function postQuestionnaireTimeline(assignment) {
@@ -655,6 +718,7 @@ function buildTimeline(plan, assignment) {
         progressCurrent: spec.trial_index_global,
         progressTotal: plan.length
       }, assignment)));
+      timeline.push(blockWorkloadTimeline(block, assignment, blockPosition, blocks.length));
       const nextBlock = blocks[blockPosition + 1];
       const aiConditionComplete = phase === "ai"
         && nextBlock
