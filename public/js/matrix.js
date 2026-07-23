@@ -21,8 +21,48 @@ export function validPositions(effectiveSize) {
   return positions;
 }
 
+function matrixRepetitionScore(matrix) {
+  let score = 0;
+  const counts = new Map();
+  for (let row = 0; row < matrix.length; row += 1) {
+    for (let col = 0; col < matrix.length; col += 1) {
+      const value = matrix[row][col];
+      counts.set(value, (counts.get(value) || 0) + 1);
+      if (col + 1 < matrix.length && matrix[row][col + 1] === value) score += 8;
+      if (row + 1 < matrix.length && matrix[row + 1][col] === value) score += 8;
+      if (col + 2 < matrix.length && matrix[row][col + 1] === value && matrix[row][col + 2] === value) {
+        score += 18;
+      }
+      if (row + 2 < matrix.length && matrix[row + 1][col] === value && matrix[row + 2][col] === value) {
+        score += 18;
+      }
+    }
+  }
+  for (let row = 0; row < matrix.length - 1; row += 1) {
+    for (let col = 0; col < matrix.length - 1; col += 1) {
+      const values = [
+        matrix[row][col],
+        matrix[row + 1][col],
+        matrix[row][col + 1],
+        matrix[row + 1][col + 1]
+      ];
+      if (new Set(values).size === 1) score += 30;
+      else if (new Set(values).size === 2) score += 6;
+    }
+  }
+  const expected = matrix.flat().length / 9;
+  for (const count of counts.values()) {
+    score += Math.max(0, count - expected - 1) * 1.5;
+  }
+  return Math.round(score * 10) / 10;
+}
+
 function generateNumberMatrix(effectiveSize, targetCount, rng) {
   const matrixSize = effectiveSize + 2;
+  let bestCandidate = null;
+  let bestScore = Infinity;
+  let firstExactAttempt = null;
+  let exactCount = 0;
   for (let attempt = 0; attempt < 3000; attempt += 1) {
     const targetPositions = shuffle(validPositions(effectiveSize), rng).slice(0, targetCount);
     const targetKeys = new Set(targetPositions.map(positionKey));
@@ -64,8 +104,24 @@ function generateNumberMatrix(effectiveSize, targetCount, rng) {
       .filter(position => relationResidual(matrix, position.row, position.col) !== 0);
     const exact = detected.length === targetCount
       && detected.every(position => targetKeys.has(positionKey(position)));
-    if (exact) return { matrix, matrixSize, targetPositions };
+    if (exact) {
+      const repetitionScore = matrixRepetitionScore(matrix);
+      exactCount += 1;
+      if (firstExactAttempt === null) firstExactAttempt = attempt;
+      if (repetitionScore < bestScore) {
+        bestScore = repetitionScore;
+        bestCandidate = { matrix, matrixSize, targetPositions, repetitionScore };
+      }
+      if (
+        repetitionScore <= matrixSize * 4
+        || exactCount >= 30
+        || attempt - firstExactAttempt >= 220
+      ) {
+        return bestCandidate;
+      }
+    }
   }
+  if (bestCandidate) return bestCandidate;
   throw new Error(`无法生成 set size ${effectiveSize}、目标数 ${targetCount} 的矩阵`);
 }
 
@@ -132,6 +188,7 @@ export function generateTrialMaterial(spec) {
   return {
     ...generated,
     ...cues,
+    repetitionScore: generated.repetitionScore,
     invalidPositions: generated.targetPositions.map(position => ({ ...position }))
   };
 }

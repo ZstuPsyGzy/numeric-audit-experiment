@@ -302,6 +302,7 @@ export class NumericAuditPlugin {
         system_event: spec.system_event,
         system_correct: spec.system_correct,
         matrix: material.matrix,
+        matrix_repetition_score: material.repetitionScore,
         ...displayMetrics,
         participant_judgment: judgment,
         correct_judgment: spec.correct_judgment,

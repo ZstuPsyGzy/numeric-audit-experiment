@@ -43,6 +43,7 @@ function rowsToCsv(rows) {
     "localization_rt_ms", "judgment_rt_ms", "judgment_confidence",
     "ai_output_trust", "deep_validity", "light_validity",
     "deep_outcome", "light_outcome", "cue_visual_style", "cue_positions_overlap", "selected_positions", "target_positions",
+    "matrix_repetition_score",
     "matrix_rendered_width_px", "matrix_rendered_height_px",
     "matrix_rendered_width_mm", "matrix_rendered_height_mm",
     "cell_rendered_width_px", "cell_rendered_height_px",
