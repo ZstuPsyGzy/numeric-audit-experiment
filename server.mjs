@@ -19,7 +19,7 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "local-development-only";
 const SUBJECT_CODE_SALT = process.env.SUBJECT_CODE_SALT || "local-development-salt";
 const PUBLIC_ORIGIN = process.env.PUBLIC_ORIGIN || "";
 const MAX_BODY_BYTES = 1024 * 1024;
-const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.6";
+const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.9";
 
 mkdirSync(DATA_DIR, { recursive: true });
 const db = new DatabaseSync(join(DATA_DIR, "experiment.sqlite3"));
@@ -252,7 +252,7 @@ async function handleApi(req, res, url) {
       jsonResponse(res, 400, {
         ok: false,
         error: "formal_subject_code_required",
-        expected_format: "P001",
+        expected_format: "A001",
         assignment_cycle_size: ASSIGNMENT_GROUPS_PER_CYCLE
       });
       return;

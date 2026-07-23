@@ -1,8 +1,10 @@
 import {
   ASSIGNMENT_GROUPS_PER_CYCLE,
+  CONDITION_PREFIXES,
   CONDITION_ORDERS,
   PHASE_ORDERS,
   SET_SIZE_ORDERS,
+  assignmentForSubjectCode,
   assignmentForSequence
 } from "../assignment.mjs";
 
@@ -50,19 +52,30 @@ function validateOrderSet(label, orders, levels, expectedPositionCount, expected
   requireUniform(`${label}一阶顺序平衡`, transitionCounts, expectedTransitions, expectedTransitionCount);
 }
 
-validateOrderSet(
-  "AI condition",
-  CONDITION_ORDERS,
-  ["90_90", "90_70", "70_90", "70_70"],
-  1,
-  1
-);
 validateOrderSet("set size", SET_SIZE_ORDERS, [3, 5, 7], 2, 2);
 
 const assignments = Array.from(
   { length: ASSIGNMENT_GROUPS_PER_CYCLE },
   (_, index) => assignmentForSequence(index + 1)
 );
+
+const prefixedAssignments = Object.keys(CONDITION_PREFIXES).flatMap(prefix =>
+  Array.from({ length: SET_SIZE_ORDERS.length }, (_, index) => {
+    const subject = `${prefix}${String(index + 1).padStart(3, "0")}`;
+    return { subject, assignment: assignmentForSubjectCode(subject) };
+  })
+);
+
+for (const [prefix, conditionKey] of Object.entries(CONDITION_PREFIXES)) {
+  const rows = prefixedAssignments.filter(row => row.subject.startsWith(prefix));
+  if (rows.some(row => row.assignment.condition_order[0] !== conditionKey)) {
+    errors.push(`${prefix} 前缀没有固定分配到 ${conditionKey}`);
+  }
+  const setRows = new Set(rows.map(row => row.assignment.set_size_order_index));
+  if (setRows.size !== SET_SIZE_ORDERS.length) {
+    errors.push(`${prefix} 前缀没有覆盖全部 ${SET_SIZE_ORDERS.length} 种 set size 顺序`);
+  }
+}
 
 const tupleCounts = countBy(assignments, assignment => [
   assignment.phase_order_index,
@@ -99,8 +112,15 @@ console.table(assignments.map(assignment => ({
   subject: `P${String(assignment.subject_sequence).padStart(3, "0")}`,
   group: assignment.assignment_group,
   phase: assignment.phase_order.join(" -> "),
-  condition_row: assignment.condition_order_index,
+  ai_condition: assignment.condition_order.join(" -> "),
   setsize_row: assignment.set_size_order_index
+})));
+
+console.table(prefixedAssignments.map(({ subject, assignment }) => ({
+  subject,
+  group: assignment.assignment_group,
+  ai_condition: assignment.condition_order.join(" -> "),
+  setsize_order: assignment.set_size_order.join(" -> ")
 })));
 
 if (errors.length) {
@@ -108,7 +128,8 @@ if (errors.length) {
   console.error(errors);
   process.exitCode = 1;
 } else {
-  console.log("\nPASS: P001-P024 form one complete fixed-phase 1 x 4 x 6 counterbalancing cycle.");
+  console.log("\nPASS: legacy P001-P024 form one complete fixed-phase 1 x 4 x 6 counterbalancing cycle.");
+  console.log("PASS: formal prefixes A/B/C/D assign fixed AI groups, and each prefix cycles through 6 set size orders.");
   console.log("PASS: every participant completes baseline before AI.");
-  console.log("PASS: AI conditions and set sizes are position-balanced and first-order carryover-balanced.");
+  console.log("PASS: each participant receives exactly one AI condition; AI condition groups and set size orders are balanced across each 24-participant cycle.");
 }

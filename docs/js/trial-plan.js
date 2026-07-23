@@ -295,6 +295,6 @@ if (typeof window === "undefined" && process.argv[1]?.endsWith("trial-plan.js"))
     console.error(validation.errors);
     process.exitCode = 1;
   } else {
-    console.log("Trial plan valid: 300 formal trials; every AI cell has Hit10/CR8/FA2/Miss0.");
+    console.log("Trial plan valid: 300 canonical material trials; every AI cell has Hit10/CR8/FA2/Miss0.");
   }
 }

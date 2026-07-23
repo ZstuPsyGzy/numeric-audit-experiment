@@ -72,7 +72,7 @@ export class NumericAuditPlugin {
         material.lightCue ? '<span><i class="cue-key light"></i>浅红候选</span>' : ""
       ].filter(Boolean).join("");
       const label = material.deepCue || material.lightCue
-        ? "AI 分析已完成：已标注目标"
+        ? "AI 分析已完成：已发现目标"
         : "AI 分析已完成：未发现目标";
       return `<span class="analysis-done">${label}</span>${cueItems}`;
     })();
@@ -88,7 +88,6 @@ export class NumericAuditPlugin {
         </header>
         <section class="trial-workspace">
           <div class="stimulus-area">
-            <p class="rule-line">规则：若某位置“上 + 下 ≠ 左 + 右”，该位置就是目标。</p>
             <div class="matrix-wrap">
               <div class="number-matrix matrix-size-${material.matrixSize}"></div>
             </div>
@@ -96,7 +95,6 @@ export class NumericAuditPlugin {
           </div>
           <aside class="response-area">
             <section class="response-section response-main">
-              <div class="response-copy"><h2>作答</h2><p>先点击所有发现的目标位置，可再次点击取消；然后完成最终判断。</p></div>
               <div class="selection-count">已选择 <strong data-selection-count>0</strong> 个位置</div>
               <div class="judgment-block">
                 <div class="judgment-actions">

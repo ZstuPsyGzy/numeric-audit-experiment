@@ -160,6 +160,52 @@ function instructionMatrixExample() {
   return `<div class="instruction-matrix" aria-label="数字矩阵，内部位置可以点击核查">${cells}</div>`;
 }
 
+function auditAreaMiniMatrix(effectiveSize) {
+  const material = generateTrialMaterial({
+    set_size: effectiveSize,
+    target_count: 1,
+    cue_profile: "none",
+    material_seed: `instruction-audit-area-size-${effectiveSize}`
+  });
+  const cells = material.matrix.flatMap((rowValues, row) => rowValues.map((value, col) => {
+    const isAudit = row > 0 && row < material.matrixSize - 1 && col > 0 && col < material.matrixSize - 1;
+    return `<span class="${isAudit ? "audit" : "reference"}">${value}</span>`;
+  })).join("");
+  return `<div class="audit-area-mini matrix-${material.matrixSize}" aria-label="不同规模矩阵的核查区域示意">${cells}</div>`;
+}
+
+function neighborCheckExample() {
+  return `<div class="neighbor-check-example" aria-label="单个位置只比较上下左右相邻数字">
+    <span></span><b class="neighbor top">上</b><span></span>
+    <b class="neighbor left">左</b><b class="center">当前位置</b><b class="neighbor right">右</b>
+    <span></span><b class="neighbor bottom">下</b><span></span>
+  </div>`;
+}
+
+function auditAreaInstructionContent() {
+  return `<div class="audit-area-layout">
+    <section class="audit-area-copy">
+      <p class="instruction-lead">不同 trial 中，矩阵规模可能不同；这只表示需要核查的位置数量不同，判断规则始终不变。</p>
+      <div class="audit-rule-cards">
+        <section><strong>只核查中间底纹区域</strong><p>带淡灰底纹的位置是需要审核、可以点击的位置。最外圈数字只是关系计算时的参考数字。</p></section>
+        <section><strong>每次只看一个位置</strong><p>判断某个位置时，只比较这个位置的上、下、左、右四个相邻数字。</p></section>
+        <section><strong>规则不会随矩阵变大而改变</strong><p>矩阵变大时，需要重复核查的位置更多；但每一个位置仍然只看上下左右。</p></section>
+      </div>
+    </section>
+    <section class="audit-area-examples" aria-label="不同规模矩阵示意">
+      <div><strong>较小规模</strong>${auditAreaMiniMatrix(3)}</div>
+      <div><strong>中等规模</strong>${auditAreaMiniMatrix(5)}</div>
+      <div><strong>较大规模</strong>${auditAreaMiniMatrix(7)}</div>
+      <p><span></span>淡灰区域 = 需要逐一核查的位置；外圈 = 参考数字。</p>
+      <div class="neighbor-check-card">
+        <strong>每次只核查一个位置</strong>
+        ${neighborCheckExample()}
+        <p>比较当前位置的上、下、左、右四个相邻数字，不需要同时看更远的位置。</p>
+      </div>
+    </section>
+  </div>`;
+}
+
 function taskIntroductionContent() {
   return `<div class="instruction-prose">
     <p class="instruction-lead">在后续画面中您将看到一个数字矩阵，您任务是核查矩阵内部的每一个有效位置（），找出是否存在不满足上下左右关系规则的目标。</p>
@@ -217,6 +263,7 @@ function aiInstructionContent() {
 function instructionContent() {
   return `<div class="practice-guide">
     <section><h2>任务说明</h2>${taskIntroductionContent()}</section>
+    <section><h2>核查区域说明</h2>${auditAreaInstructionContent()}</section>
     <section><h2>矩阵与判断规则</h2>${taskRuleVisualContent()}</section>
     <section><h2>AI 辅助说明</h2>${aiInstructionContent()}</section>
   </div>`;
@@ -531,7 +578,14 @@ function buildTimeline(plan, assignment) {
       type: ExperimentScreenPlugin,
       title: "任务说明",
       content: taskIntroductionContent(),
-      button_label: "下一步：查看矩阵示意",
+      button_label: "下一步：查看核查区域",
+      screen_class: "instruction-screen"
+    },
+    {
+      type: ExperimentScreenPlugin,
+      title: "核查区域说明",
+      content: auditAreaInstructionContent(),
+      button_label: "下一步：查看判断规则",
       screen_class: "instruction-screen"
     },
     {
@@ -696,8 +750,8 @@ form.addEventListener("submit", async event => {
     formError.textContent = "请输入邮件或招募信息中提供的被试编号。";
     return;
   }
-  if (mode === "formal" && !/^P\d{3,}$/i.test(participant.subject_code)) {
-    formError.textContent = "正式实验请输入实验员提供的编号，例如 P001。";
+  if (mode === "formal" && !/^(?:[ABCD]|P)\d{3,}$/i.test(participant.subject_code)) {
+    formError.textContent = "正式实验请输入实验员提供的编号，例如 A001。";
     return;
   }
   if (!Number.isInteger(participant.age) || participant.age < 18 || participant.age > 80) {
@@ -741,7 +795,7 @@ form.addEventListener("submit", async event => {
     if (error.message === "device_not_supported") {
       formError.textContent = "当前设备不满足实验要求。";
     } else if (error.message === "formal_subject_code_required") {
-      formError.textContent = "正式实验请输入实验员提供的编号，例如 P001。";
+      formError.textContent = "正式实验请输入实验员提供的编号，例如 A001。";
     } else {
       formError.textContent = "未能连接实验服务器，请检查网络后重试。";
     }

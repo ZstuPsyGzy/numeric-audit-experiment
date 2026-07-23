@@ -1,4 +1,4 @@
-export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.6";
+export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.9";
 export const MATERIAL_SEED = "numeric-audit-material-v3-no-cue-overlap-fixed-for-all-participants";
 export const CUE_VISUAL_STYLE = "cell_background_tint_v4_manual_b93f4a_e6a0a8";
 export const SET_SIZES = [3, 5, 7];
@@ -37,7 +37,7 @@ export const DEFAULT_ASSIGNMENT = {
   condition_order_index: 1,
   set_size_order_index: 1,
   phase_order: ["baseline", "ai"],
-  condition_order: ["90_90", "90_70", "70_70", "70_90"],
+  condition_order: ["90_90"],
   set_size_order: [3, 5, 7],
   cue_mapping: { deep: "deep_red", light: "light_red" }
 };

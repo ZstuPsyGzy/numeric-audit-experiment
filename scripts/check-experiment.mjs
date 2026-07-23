@@ -22,7 +22,7 @@ for (const spec of plan) {
 }
 
 console.table(planValidation.summary);
-console.log(`\nFormal trials: ${plan.length}`);
+console.log(`\nCanonical material trials: ${plan.length}`);
 console.log(`Plan errors: ${planValidation.errors.length}`);
 console.log(`Material errors: ${materialErrors.length}`);
 console.log(`Deep/light cue overlaps: ${cueOverlapCount}`);
