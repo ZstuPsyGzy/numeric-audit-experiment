@@ -160,14 +160,14 @@ function instructionMatrixExample() {
     if (rowIndex === 2 && (colIndex === 1 || colIndex === 3)) classes.push("horizontal-link");
     return `<span class="${classes.join(" ")}">${value}</span>`;
   })).join("");
-  return `<div class="instruction-matrix" aria-label="五乘五数字矩阵，内部三乘三区域可以点击核查">${cells}</div>`;
+  return `<div class="instruction-matrix" aria-label="数字矩阵，内部位置可以点击核查">${cells}</div>`;
 }
 
 function taskIntroductionContent() {
   return `<div class="instruction-prose">
     <p class="instruction-lead">你将看到一个数字矩阵。任务是核查矩阵内部的每一个有效位置，找出是否存在不满足上下左右关系规则的目标。</p>
     <div class="task-definition-grid">
-      <section><strong>需要核查什么</strong><p>依次查看矩阵内部的可点击位置。外圈数字只用于建立关系，不需要点击。</p></section>
+      <section><strong>需要核查什么</strong><p>矩阵内部所有可点击位置构成核查区域。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
       <section><strong>什么是目标</strong><p>对某个核查位置，如果“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”，该位置就是目标。</p></section>
       <section><strong>怎样作答</strong><p>先点击发现的全部目标，再判断整张矩阵“合规”或“不合规”。</p></section>
     </div>
@@ -181,7 +181,7 @@ function taskIntroductionContent() {
 function taskRuleVisualContent() {
   return `<div class="rule-visual-layout">
     <section class="matrix-figure">
-      <div class="figure-labels"><span class="reference-label">外圈：关系参考数字</span><span class="audit-label">内部 3×3：可点击核查区域</span></div>
+      <div class="figure-labels"><span class="reference-label">外圈：关系参考数字</span><span class="audit-label">矩阵内部：可点击核查区域</span></div>
       ${instructionMatrixExample()}
       <div class="matrix-legend"><span><i class="legend-audit"></i>可点击核查位置</span><span><i class="legend-focus"></i>当前示例位置</span></div>
     </section>
@@ -254,14 +254,14 @@ function validityBar(label, value, colorClass) {
 function blockIntro(spec, trialCount) {
   if (!spec.ai_present) {
     return {
-      title: `无 AI · 有效核查位置 ${spec.set_size}×${spec.set_size}`,
-      content: `<div class="block-intro"><p>本组共 ${trialCount} 个 trial，不显示 AI 候选。完整数字矩阵为 ${spec.matrix_size}×${spec.matrix_size}。</p><p>请保持准确，在确认后再提交判断。</p></div>`
+      title: "无 AI · 独立审核",
+      content: `<div class="block-intro"><p>本组共 ${trialCount} 个 trial，不显示 AI 候选。</p><p>请保持准确，在确认后再提交判断。</p></div>`
     };
   }
   return {
-    title: `${AI_CONDITIONS[spec.condition_key].label} · ${spec.set_size}×${spec.set_size}`,
+    title: AI_CONDITIONS[spec.condition_key].label,
     content: `<div class="block-intro">
-      <p>本组共 ${trialCount} 个 trial，完整数字矩阵为 ${spec.matrix_size}×${spec.matrix_size}。以下百分比表示：该颜色候选出现时，它落在真实目标位置上的历史比例。</p>
+      <p>本组共 ${trialCount} 个 trial。以下百分比表示：该颜色候选出现时，它落在真实目标位置上的历史比例。</p>
       <div class="validity-bars">
         ${validityBar("深红候选有效率", spec.deep_validity, "deep-fill")}
         ${validityBar("浅红候选有效率", spec.light_validity, "light-fill")}

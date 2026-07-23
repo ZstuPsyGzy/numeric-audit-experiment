@@ -69,7 +69,7 @@ export class NumericAuditPlugin {
     displayElement.innerHTML = `
       <main class="trial-screen">
         <header class="trial-header">
-          <div><strong>数字关系核查</strong><span>${spec.ai_present ? "AI 辅助" : "独立审核"} · 有效核查位置 ${spec.set_size}×${spec.set_size}</span></div>
+          <div><strong>数字关系核查</strong><span>${spec.ai_present ? "AI 辅助" : "独立审核"}</span></div>
           <div class="trial-header-actions">
             ${trial.practice && trial.instruction_html ? '<button class="review-instructions-button" type="button" data-review-instructions>返回阅读指导语</button>' : ""}
             <div class="trial-progress"><span>${trial.practice ? "练习" : `${trial.progress_current} / ${trial.progress_total}`}</span><progress max="${trial.progress_total || 1}" value="${trial.progress_current || 0}"></progress></div>
@@ -77,7 +77,7 @@ export class NumericAuditPlugin {
         </header>
         <section class="trial-workspace">
           <div class="stimulus-area">
-            <p class="rule-line">规则：逐一核查可点击位置。若某位置“上 + 下 ≠ 左 + 右”，该位置就是目标。</p>
+            <p class="rule-line">规则：若某位置“上 + 下 ≠ 左 + 右”，该位置就是目标。</p>
             <div class="matrix-wrap">
               <div class="number-matrix matrix-size-${material.matrixSize}"></div>
             </div>
