@@ -318,13 +318,17 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .number-matrix {
   --matrix-size: 5;
   --matrix-gap: 6px;
+  --matrix-cell-size: 44px;
+  --matrix-render-size: 244px;
   position: relative;
   isolation: isolate;
-  width: min(60vh, 560px, 95%);
-  aspect-ratio: 1;
+  width: var(--matrix-render-size);
+  height: var(--matrix-render-size);
+  max-width: 96%;
+  max-height: 100%;
   display: grid;
-  grid-template-columns: repeat(var(--matrix-size), minmax(0, 1fr));
-  grid-template-rows: repeat(var(--matrix-size), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--matrix-size), var(--matrix-cell-size));
+  grid-template-rows: repeat(var(--matrix-size), var(--matrix-cell-size));
   gap: var(--matrix-gap);
 }
 .number-matrix::before {
@@ -352,7 +356,7 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
   color: #050607;
   display: grid;
   place-items: center;
-  font-size: clamp(18px, calc(45vh / var(--matrix-size)), 42px);
+  font-size: clamp(18px, calc(var(--matrix-cell-size) * 0.64), 36px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -494,7 +498,6 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 
 @media (max-width: 1050px) {
   .trial-header { grid-template-columns: 1fr minmax(350px, 420px); }
-  .number-matrix { width: min(58vh, 520px, 94%); }
   .response-main { grid-template-columns: 160px minmax(360px, 1fr); gap: 12px; }
   .rating-section { grid-template-columns: auto minmax(0, 1fr) 120px; gap: 12px; }
   .rating-list { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }

@@ -1,6 +1,10 @@
 import { CUE_VISUAL_STYLE, MATRIX_GAP_MM } from "./config.js";
 
 const { ParameterType } = window.jsPsychModule;
+const MAX_DISPLAY_MATRIX_SIZE = 9;
+const MAX_DISPLAY_MATRIX_WIDTH_MM = 118;
+const MIN_CELL_SIZE_PX = 24;
+const MAX_CELL_SIZE_PX = 56;
 
 function keyOf(position) {
   return `${position.row},${position.col}`;
@@ -142,7 +146,21 @@ export class NumericAuditPlugin {
     const closeInstructionsButton = displayElement.querySelector("[data-close-instructions]");
     const pxPerMm = Number(window.__displayCalibration?.px_per_mm) || null;
     const requestedGapPx = pxPerMm ? MATRIX_GAP_MM * pxPerMm : 6;
+    const viewportLimitPx = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.58, 560);
+    const calibratedLimitPx = pxPerMm ? MAX_DISPLAY_MATRIX_WIDTH_MM * pxPerMm : viewportLimitPx;
+    const referenceMatrixWidthPx = Math.min(viewportLimitPx, calibratedLimitPx);
+    const computedCellSizePx = (
+      referenceMatrixWidthPx - requestedGapPx * (MAX_DISPLAY_MATRIX_SIZE - 1)
+    ) / MAX_DISPLAY_MATRIX_SIZE;
+    const controlledCellSizePx = Math.min(
+      MAX_CELL_SIZE_PX,
+      Math.max(MIN_CELL_SIZE_PX, computedCellSizePx)
+    );
+    const controlledMatrixWidthPx = controlledCellSizePx * material.matrixSize
+      + requestedGapPx * (material.matrixSize - 1);
     matrixElement.style.setProperty("--matrix-gap", `${round(requestedGapPx)}px`);
+    matrixElement.style.setProperty("--matrix-cell-size", `${round(controlledCellSizePx)}px`);
+    matrixElement.style.setProperty("--matrix-render-size", `${round(controlledMatrixWidthPx)}px`);
 
     if (reviewButton && instructionOverlay && closeInstructionsButton) {
       reviewButton.addEventListener("click", () => {
@@ -221,6 +239,12 @@ export class NumericAuditPlugin {
       cell_rendered_width_mm: cellRect ? toMm(cellRect.width) : null,
       cell_rendered_height_mm: cellRect ? toMm(cellRect.height) : null,
       matrix_gap_requested_mm: MATRIX_GAP_MM,
+      matrix_size_control: "constant_cell_size_across_set_sizes",
+      matrix_reference_max_size: MAX_DISPLAY_MATRIX_SIZE,
+      matrix_reference_width_px: round(referenceMatrixWidthPx),
+      matrix_reference_width_mm: toMm(referenceMatrixWidthPx),
+      matrix_cell_controlled_px: round(controlledCellSizePx),
+      matrix_cell_controlled_mm: toMm(controlledCellSizePx),
       matrix_column_gap_px: Number.isFinite(columnGapPx) ? round(columnGapPx) : null,
       matrix_row_gap_px: Number.isFinite(rowGapPx) ? round(rowGapPx) : null,
       matrix_column_gap_mm: Number.isFinite(columnGapPx) ? toMm(columnGapPx) : null,
