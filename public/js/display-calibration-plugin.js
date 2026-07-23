@@ -75,7 +75,7 @@ export class DisplayCalibrationPlugin {
             <section class="gray-check" aria-labelledby="gray-check-title">
               <h2 id="gray-check-title">灰阶辨认</h2>
               <div class="gray-bands" aria-label="从深到浅的八个灰阶">
-                ${["#171717", "#363636", "#555555", "#747474", "#939393", "#b2b2b2", "#d1d1d1", "#f0f0f0"].map(color => `<i style="background:${color}"></i>`).join("")}
+                ${Array.from({ length: 8 }, () => "<i></i>").join("")}
               </div>
               <p>你能否区分所有相邻灰阶？</p>
               <div class="binary-check">

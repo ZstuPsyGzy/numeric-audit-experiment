@@ -167,7 +167,7 @@ function taskIntroductionContent() {
   return `<div class="instruction-prose">
     <p class="instruction-lead">你将看到一个数字矩阵。任务是核查矩阵内部的每一个有效位置，找出是否存在不满足上下左右关系规则的目标。</p>
     <div class="task-definition-grid">
-      <section><strong>需要核查什么</strong><p>矩阵内部所有可点击位置构成核查区域。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
+      <section><strong>需要核查什么</strong><p>矩阵内部带有淡灰底纹的可点击位置构成核查区域。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
       <section><strong>什么是目标</strong><p>对某个核查位置，如果“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”，该位置就是目标。</p></section>
       <section><strong>怎样作答</strong><p>先点击发现的全部目标，再判断整张矩阵“合规”或“不合规”。</p></section>
     </div>
@@ -181,7 +181,7 @@ function taskIntroductionContent() {
 function taskRuleVisualContent() {
   return `<div class="rule-visual-layout">
     <section class="matrix-figure">
-      <div class="figure-labels"><span class="reference-label">外圈：关系参考数字</span><span class="audit-label">矩阵内部：可点击核查区域</span></div>
+      <div class="figure-labels"><span class="reference-label">外圈：关系参考数字</span><span class="audit-label">淡灰底纹：可点击核查区域</span></div>
       ${instructionMatrixExample()}
       <div class="matrix-legend"><span><i class="legend-audit"></i>可点击核查位置</span><span><i class="legend-focus"></i>当前示例位置</span></div>
     </section>
@@ -277,6 +277,11 @@ function selectPracticeSpecs(phase, formalPlan) {
     ? "baseline"
     : formalPlan.find(trial => trial.phase === "ai")?.condition_key || "90_90";
   const pool = canonical.filter(trial => trial.condition_key === conditionKey && trial.set_size === 3);
+  const correctAiPool = pool.filter(trial =>
+    trial.system_event !== "false_alarm"
+    && trial.deep_outcome !== "invalid"
+    && trial.light_outcome !== "invalid"
+  );
   const chosen = phase === "baseline"
     ? [
       pool.find(trial => trial.target_count === 0),
@@ -286,11 +291,11 @@ function selectPracticeSpecs(phase, formalPlan) {
       pool.find(trial => trial.target_count === 2)
     ]
     : [
-      pool.find(trial => trial.system_event === "correct_rejection"),
-      pool.find(trial => trial.system_event === "false_alarm"),
-      pool.find(trial => trial.system_event === "hit" && trial.target_count === 1),
-      pool.filter(trial => trial.system_event === "hit" && trial.target_count === 1)[1],
-      pool.find(trial => trial.system_event === "hit" && trial.target_count === 2)
+      correctAiPool.find(trial => trial.system_event === "correct_rejection"),
+      correctAiPool.filter(trial => trial.system_event === "correct_rejection")[1],
+      correctAiPool.find(trial => trial.system_event === "hit" && trial.target_count === 1),
+      correctAiPool.filter(trial => trial.system_event === "hit" && trial.target_count === 1)[1],
+      correctAiPool.find(trial => trial.system_event === "hit" && trial.target_count === 2)
     ];
   return chosen.map((spec, index) => ({
     ...spec,

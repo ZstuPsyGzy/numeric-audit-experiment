@@ -65,6 +65,17 @@ export class NumericAuditPlugin {
     let judgment = null;
     let judgmentAt = null;
     let fixationActualDuration = null;
+    const cueStatusHtml = (() => {
+      if (!spec.ai_present) return "本阶段不提供 AI 分析";
+      const cueItems = [
+        material.deepCue ? '<span><i class="cue-key deep"></i>深红候选</span>' : "",
+        material.lightCue ? '<span><i class="cue-key light"></i>浅红候选</span>' : ""
+      ].filter(Boolean).join("");
+      const label = material.deepCue || material.lightCue
+        ? "AI 分析已完成：已标注目标"
+        : "AI 分析已完成：未发现目标";
+      return `<span class="analysis-done">${label}</span>${cueItems}`;
+    })();
 
     displayElement.innerHTML = `
       <main class="trial-screen">
@@ -81,7 +92,7 @@ export class NumericAuditPlugin {
             <div class="matrix-wrap">
               <div class="number-matrix matrix-size-${material.matrixSize}"></div>
             </div>
-            <div class="cue-status">${spec.ai_present ? '<span class="analysis-done">AI 分析完成</span><span><i class="cue-key deep"></i>深红候选</span><span><i class="cue-key light"></i>浅红候选</span>' : "本阶段不提供 AI 候选"}</div>
+            <div class="cue-status">${cueStatusHtml}</div>
           </div>
           <aside class="response-area">
             <section class="response-section response-main">
@@ -198,6 +209,9 @@ export class NumericAuditPlugin {
     const matrixStyle = getComputedStyle(matrixElement);
     const columnGapPx = Number.parseFloat(matrixStyle.columnGap);
     const rowGapPx = Number.parseFloat(matrixStyle.rowGap);
+    if (cellRect && Number.isFinite(columnGapPx)) {
+      matrixElement.style.setProperty("--audit-region-inset", `${round(cellRect.width + columnGapPx)}px`);
+    }
     const toMm = value => pxPerMm ? round(value / pxPerMm) : null;
     const displayMetrics = {
       matrix_rendered_width_px: round(matrixRect.width),
