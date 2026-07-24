@@ -1,3 +1,9 @@
+import {
+  MATRIX_MAX_WIDTH_MM,
+  MATRIX_VIEWPORT_HEIGHT_RATIO,
+  MATRIX_VIEWPORT_WIDTH_RATIO
+} from "./config.js";
+
 const { ParameterType } = window.jsPsychModule;
 
 const REFERENCE_WIDTH_MM = 85.6;
@@ -145,6 +151,16 @@ export class DisplayCalibrationPlugin {
 
     finishButton.addEventListener("click", () => {
       const pxPerMm = referenceWidthPx / REFERENCE_WIDTH_MM;
+      const requiredMatrixWidthPx = MATRIX_MAX_WIDTH_MM * pxPerMm;
+      const availableMatrixWidthPx = Math.min(
+        innerWidth * MATRIX_VIEWPORT_WIDTH_RATIO,
+        innerHeight * MATRIX_VIEWPORT_HEIGHT_RATIO
+      );
+      if (requiredMatrixWidthPx > availableMatrixWidthPx) {
+        colorWarning.hidden = false;
+        colorWarning.textContent = `当前屏幕无法按固定 ${MATRIX_MAX_WIDTH_MM} mm 呈现最大矩阵。请提高屏幕分辨率、将系统显示缩放调整为 100%，然后刷新页面重新校准。`;
+        return;
+      }
       const calibration = {
         trial_kind: "display_calibration",
         calibration_method: "iso_id1_card_manual_match",
@@ -153,6 +169,10 @@ export class DisplayCalibrationPlugin {
         calibration_reference_height_mm: REFERENCE_HEIGHT_MM,
         calibration_reference_width_px: referenceWidthPx,
         px_per_mm: round(pxPerMm, 4),
+        fixed_matrix_width_mm: MATRIX_MAX_WIDTH_MM,
+        fixed_matrix_required_width_px: round(requiredMatrixWidthPx, 2),
+        fixed_matrix_available_width_px: round(availableMatrixWidthPx, 2),
+        fixed_matrix_size_check_passed: true,
         estimated_420px_width_mm: round(420 / pxPerMm, 2),
         deep_red_hex: "#941c24",
         light_red_hex: "#de8d92",

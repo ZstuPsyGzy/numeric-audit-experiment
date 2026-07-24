@@ -108,8 +108,8 @@ function runPreflight() {
     },
     {
       label: "屏幕尺寸",
-      pass: screen.width >= 1024 && screen.height >= 700,
-      detail: `检测到 ${screen.width}×${screen.height}，最低要求 1024×700`
+      pass: screen.width >= 1280 && screen.height >= 800,
+      detail: `检测到 ${screen.width}×${screen.height}，最低要求 1280×800`
     },
     {
       label: "全屏功能",
