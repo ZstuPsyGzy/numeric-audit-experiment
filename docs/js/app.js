@@ -236,6 +236,21 @@ function taskIntroductionContent() {
   </div>`;
 }
 
+function experimentFlowContent() {
+  return `<div class="experiment-flow-overview">
+    <p class="instruction-lead">整个实验将按照以下顺序进行，预计需要约 60–75 分钟。区组之间可以短暂休息。</p>
+    <ol class="experiment-flow-grid">
+      <li><span class="flow-index">1</span><div><strong>学习任务规则</strong><p>阅读数字矩阵、核查区域和目标判断规则，并完成一道理解检查。</p></div></li>
+      <li><span class="flow-index">2</span><div><strong>显示与尺寸校准</strong><p>进入全屏，完成简单的颜色辨认和实体卡片尺寸校准。</p></div></li>
+      <li><span class="flow-index">3</span><div><strong>独立审核阶段</strong><p>先完成无 AI 练习，再独立完成数字矩阵核查任务。</p></div></li>
+      <li><span class="flow-index">4</span><div><strong>AI 辅助审核阶段</strong><p>阅读 AI 候选提示说明，完成 AI 练习和 AI 辅助核查任务。</p></div></li>
+      <li><span class="flow-index">5</span><div><strong>阶段评价</strong><p>在实验区组结束后，报告本阶段的任务负荷及辅助系统使用感受。</p></div></li>
+      <li><span class="flow-index">6</span><div><strong>实验后问卷</strong><p>完成简短问卷，最后生成并保存匿名实验数据文件。</p></div></li>
+    </ol>
+    <div class="ai-boundary-note"><strong>请按页面顺序完成</strong><p>实验过程中请保持全屏并独立作答。每个阶段开始前，程序都会再次显示相应说明。</p></div>
+  </div>`;
+}
+
 function taskRuleVisualContent() {
   return `<div class="rule-visual-layout">
     <section class="matrix-figure">
@@ -729,6 +744,13 @@ function buildTimeline(plan, assignment) {
       type: window.jsPsychBrowserCheck,
       features: ["width", "height", "browser", "browser_version", "mobile", "os", "fullscreen"],
       on_finish: data => { browserCheckData = { ...data }; }
+    },
+    {
+      type: ExperimentScreenPlugin,
+      title: "实验整体流程",
+      content: experimentFlowContent(),
+      button_label: "下一步：了解任务",
+      screen_class: "instruction-screen flow-overview-screen"
     },
     {
       type: ExperimentScreenPlugin,
