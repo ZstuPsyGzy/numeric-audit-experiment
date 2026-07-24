@@ -2,9 +2,9 @@ import { CUE_VISUAL_STYLE, MATRIX_GAP_MM } from "./config.js";
 
 const { ParameterType } = window.jsPsychModule;
 const MAX_DISPLAY_MATRIX_SIZE = 9;
-const MAX_DISPLAY_MATRIX_WIDTH_MM = 118;
+const MAX_DISPLAY_MATRIX_WIDTH_MM = 135;
 const MIN_CELL_SIZE_PX = 24;
-const MAX_CELL_SIZE_PX = 56;
+const MAX_CELL_SIZE_PX = 64;
 
 function keyOf(position) {
   return `${position.row},${position.col}`;
@@ -146,7 +146,7 @@ export class NumericAuditPlugin {
     const closeInstructionsButton = displayElement.querySelector("[data-close-instructions]");
     const pxPerMm = Number(window.__displayCalibration?.px_per_mm) || null;
     const requestedGapPx = pxPerMm ? MATRIX_GAP_MM * pxPerMm : 6;
-    const viewportLimitPx = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.58, 560);
+    const viewportLimitPx = Math.min(window.innerWidth * 0.86, window.innerHeight * 0.64, 640);
     const calibratedLimitPx = pxPerMm ? MAX_DISPLAY_MATRIX_WIDTH_MM * pxPerMm : viewportLimitPx;
     const referenceMatrixWidthPx = Math.min(viewportLimitPx, calibratedLimitPx);
     const computedCellSizePx = (
