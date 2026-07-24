@@ -275,12 +275,15 @@ function aiInstructionContent() {
   </div>`;
 }
 
-function instructionContent() {
+function instructionContent(phase, reliabilitySpec = null) {
+  const aiSections = phase === "ai" ? `
+    <section><h2>AI 辅助说明</h2>${aiInstructionContent()}</section>
+    ${reliabilitySpec ? `<section><h2>本组 AI 历史正确率</h2>${aiReliabilityInstructionContent(reliabilitySpec)}</section>` : ""}` : "";
   return `<div class="practice-guide">
     <section><h2>任务说明</h2>${taskIntroductionContent()}</section>
     <section><h2>核查区域说明</h2>${auditAreaInstructionContent()}</section>
     <section><h2>矩阵与判断规则</h2>${taskRuleVisualContent()}</section>
-    <section><h2>AI 辅助说明</h2>${aiInstructionContent()}</section>
+    ${aiSections}
   </div>`;
 }
 
@@ -302,12 +305,51 @@ function phaseIntro(phase) {
   }
   return {
     title: "AI 辅助审核阶段",
-    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示深红和/或浅红候选；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>首次进入 AI 阶段时进行一次 5-trial AI 熟悉练习。达到 80% 后进入正式实验；后续四个 AI 条件不再重复练习。</p></div>`
+    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示深红和/或浅红候选；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>根据实验安排，每位参与者只使用一种 AI 配置。下一页将说明你本阶段所用 AI 的历史表现，随后进行一次 5-trial AI 熟悉练习。</p></div>`
   };
 }
 
 function validityBar(label, value, colorClass) {
   return `<div class="validity-row"><span>${label}</span><progress class="${colorClass}" max="1" value="${value}"></progress><strong>${Math.round(value * 100)}%</strong></div>`;
+}
+
+function reliabilityUnits(value, colorClass) {
+  const validCount = Math.round(value * 10);
+  return `<div class="reliability-units ${colorClass}" aria-label="10 个候选中 ${validCount} 个命中目标">
+    ${Array.from({ length: 10 }, (_, index) => `<i class="${index < validCount ? "valid" : "invalid"}"></i>`).join("")}
+  </div>`;
+}
+
+function aiReliabilityInstructionContent(spec) {
+  return `<div class="reliability-instruction">
+    <p class="instruction-lead">以下历史正确率适用于你接下来整个 AI 阶段，并在所有矩阵规模中保持不变。</p>
+    <div class="reliability-definition">
+      <section><strong>历史正确率如何计算</strong><p>当某种颜色候选出现时，如果它所在的位置确实是目标，就记为一次正确；如果它标在正常位置上，就记为一次错误。</p></section>
+      <section><strong>颜色与正确率是两件事</strong><p>深红表示模型给出的第一核查优先级，浅红表示第二核查优先级；历史正确率反映这些候选过去的实际表现。</p></section>
+    </div>
+    <div class="reliability-condition-card">
+      <div>
+        <span class="reliability-cue-label"><i class="cue-key deep"></i>深红候选</span>
+        <strong>${Math.round(spec.deep_validity * 100)}%</strong>
+        ${reliabilityUnits(spec.deep_validity, "deep")}
+        <p>每 10 次深红候选中，约 ${Math.round(spec.deep_validity * 10)} 次位于真实目标位置。</p>
+      </div>
+      <div>
+        <span class="reliability-cue-label"><i class="cue-key light"></i>浅红候选</span>
+        <strong>${Math.round(spec.light_validity * 100)}%</strong>
+        ${reliabilityUnits(spec.light_validity, "light")}
+        <p>每 10 次浅红候选中，约 ${Math.round(spec.light_validity * 10)} 次位于真实目标位置。</p>
+      </div>
+    </div>
+    <div class="ai-boundary-note"><strong>仍需自行核查</strong><p>历史正确率不代表当前候选一定正确，也不直接表示整张矩阵是否合规。请结合上下左右关系规则完成最终判断。</p></div>
+  </div>`;
+}
+
+function reliabilityCheckOptions() {
+  return Object.values(AI_CONDITIONS).map(condition => ({
+    value: condition.key,
+    label: `深红 ${Math.round(condition.deep_validity * 100)}% / 浅红 ${Math.round(condition.light_validity * 100)}%`
+  }));
 }
 
 function blockIntro(spec, trialCount) {
@@ -637,10 +679,13 @@ async function syncQueue() {
 function practiceLoop(phase, formalPlan, assignment) {
   const practiceState = { attempt: 0, lastAccuracy: null };
   const specs = selectPracticeSpecs(phase, formalPlan);
+  const reliabilitySpec = phase === "ai"
+    ? formalPlan.find(trial => trial.phase === "ai")
+    : null;
   return {
     timeline: specs.map(spec => prepareNumericTrial(spec, {
       practice: true,
-      instructionHtml: instructionContent()
+      instructionHtml: instructionContent(phase, reliabilitySpec)
     }, assignment)),
     loop_function: data => {
       const rows = data.values().filter(row => row.trial_kind === "numeric_audit" && row.practice);
@@ -696,13 +741,6 @@ function buildTimeline(plan, assignment) {
       check_error: "再算一次：分别比较“上 + 下”和“左 + 右”。"
     },
     {
-      type: ExperimentScreenPlugin,
-      title: "AI 辅助说明",
-      content: aiInstructionContent(),
-      button_label: "已了解，进入全屏",
-      screen_class: "instruction-screen"
-    },
-    {
       type: window.jsPsychFullscreen,
       fullscreen_mode: true,
       message: "<p>接下来的练习和正式实验需要保持全屏。</p>",
@@ -718,7 +756,35 @@ function buildTimeline(plan, assignment) {
   for (const phase of assignment.phase_order) {
     const phaseTrials = plan.filter(trial => trial.phase === phase);
     const intro = phaseIntro(phase);
-    timeline.push({ type: ExperimentScreenPlugin, ...intro, button_label: skipPractice ? "进入预测试区组" : "开始练习" });
+    timeline.push({
+      type: ExperimentScreenPlugin,
+      ...intro,
+      button_label: phase === "ai"
+        ? "下一步：了解 AI"
+        : skipPractice ? "进入预测试区组" : "开始练习"
+    });
+    if (phase === "ai") {
+      const aiSpec = phaseTrials[0];
+      timeline.push({
+        type: ExperimentScreenPlugin,
+        title: "AI 候选提示说明",
+        content: aiInstructionContent(),
+        button_label: "下一步：查看历史正确率",
+        screen_class: "instruction-screen"
+      });
+      timeline.push({
+        type: ExperimentScreenPlugin,
+        title: "本组 AI 的历史正确率",
+        content: aiReliabilityInstructionContent(aiSpec),
+        button_label: skipPractice ? "理解正确，进入预测试区组" : "理解正确，开始 AI 练习",
+        screen_class: "instruction-screen check-screen reliability-screen",
+        check_question: "<p>你在本阶段使用的 AI，深红候选和浅红候选的历史正确率分别是多少？</p>",
+        check_options: reliabilityCheckOptions(),
+        check_correct: aiSpec.condition_key,
+        check_success: `回答正确：深红 ${Math.round(aiSpec.deep_validity * 100)}%，浅红 ${Math.round(aiSpec.light_validity * 100)}%。`,
+        check_error: "请重新查看上方两种颜色候选对应的历史正确率。"
+      });
+    }
     if (!skipPractice) {
       timeline.push(practiceLoop(phase, plan, assignment));
       timeline.push({

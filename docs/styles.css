@@ -295,6 +295,21 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .validity-row progress.light-fill::-webkit-progress-value { background: var(--light-red); }
 .validity-row progress.deep-fill::-moz-progress-bar { background: var(--deep-red); }
 .validity-row progress.light-fill::-moz-progress-bar { background: var(--light-red); }
+.reliability-instruction { max-width: 900px; margin: 0 auto; }
+.reliability-definition { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.reliability-definition section { padding: 15px 17px; border: 1px solid var(--line); background: #f8f9fa; }
+.reliability-definition strong { display: block; margin-bottom: 7px; font-size: 13px; }
+.reliability-definition p { margin: 0; color: #4b535a; font-size: 11px; line-height: 1.7; }
+.reliability-condition-card { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.reliability-condition-card > div { padding: 18px; border: 1px solid var(--line); background: #fff; }
+.reliability-condition-card > div > strong { display: block; margin: 10px 0; font-size: 30px; }
+.reliability-condition-card p { margin: 11px 0 0; color: #4d555d; font-size: 11px; line-height: 1.65; }
+.reliability-cue-label { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; }
+.reliability-units { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.reliability-units i { height: 18px; border: 1px solid #d6dce1; background: #eef1f3; }
+.reliability-units.deep i.valid { border-color: var(--deep-red); background: var(--deep-red-soft); }
+.reliability-units.light i.valid { border-color: var(--light-red); background: var(--light-red-soft); }
+.reliability-screen .instruction-check-options { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
 
 .trial-screen { height: 100vh; min-height: 700px; overflow: hidden; background: #eef0f2; }
 .trial-header { height: 58px; padding: 9px 18px; border-bottom: 1px solid var(--line); background: #fff; display: grid; grid-template-columns: 1fr minmax(370px, 480px); gap: 20px; align-items: center; }
