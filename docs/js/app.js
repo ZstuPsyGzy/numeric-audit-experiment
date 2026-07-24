@@ -233,6 +233,7 @@ function taskIntroductionContent() {
       <span><b>合规</b>：没有发现目标</span>
       <span><b>不合规</b>：发现一个或多个目标</span>
     </div>
+    <div class="ai-boundary-note"><strong>任务要求</strong><p>请在保证准确的前提下尽可能快速完成任务。</p></div>
   </div>`;
 }
 

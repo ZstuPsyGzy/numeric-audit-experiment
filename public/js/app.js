@@ -220,7 +220,7 @@ function auditAreaInstructionContent() {
 
 function taskIntroductionContent() {
   return `<div class="instruction-prose">
-    <p class="instruction-lead">在后续画面中您将看到一个数字矩阵，您任务是核查矩阵内部的每一个有效位置（），找出是否存在不满足上下左右关系规则的目标。</p>
+    <p class="instruction-lead">你将看到一个数字矩阵。任务是核查矩阵内部的每一个有效位置，找出是否存在不满足上下左右关系规则的目标。</p>
     <div class="task-definition-grid">
       <section><strong>需要核查什么</strong><p>矩阵内部带有淡灰底纹的可点击位置构成核查区域。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
       <section><strong>什么是目标</strong><p>对某个核查位置，如果“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”，该位置就是目标。</p></section>
@@ -230,6 +230,7 @@ function taskIntroductionContent() {
       <span><b>合规</b>：没有发现目标</span>
       <span><b>不合规</b>：发现一个或多个目标</span>
     </div>
+    <div class="ai-boundary-note"><strong>任务要求</strong><p>请在保证准确的前提下尽可能快速完成任务。</p></div>
   </div>`;
 }
 
