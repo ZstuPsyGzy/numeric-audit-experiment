@@ -718,6 +718,10 @@ function practiceLoop(phase, formalPlan, assignment) {
 }
 
 function buildTimeline(plan, assignment) {
+  const overviewPage = { title: "实验整体流程", content: experimentFlowContent() };
+  const taskPage = { title: "任务说明", content: taskIntroductionContent() };
+  const auditAreaPage = { title: "核查区域说明", content: auditAreaInstructionContent() };
+  const rulePage = { title: "矩阵、核查区域与判断规则", content: taskRuleVisualContent() };
   const timeline = [
     {
       type: window.jsPsychBrowserCheck,
@@ -726,29 +730,28 @@ function buildTimeline(plan, assignment) {
     },
     {
       type: ExperimentScreenPlugin,
-      title: "实验整体流程",
-      content: experimentFlowContent(),
+      ...overviewPage,
       button_label: "下一步：了解任务",
       screen_class: "instruction-screen flow-overview-screen"
     },
     {
       type: ExperimentScreenPlugin,
-      title: "任务说明",
-      content: taskIntroductionContent(),
+      ...taskPage,
+      back_pages: [overviewPage],
       button_label: "下一步：查看核查区域",
       screen_class: "instruction-screen"
     },
     {
       type: ExperimentScreenPlugin,
-      title: "核查区域说明",
-      content: auditAreaInstructionContent(),
+      ...auditAreaPage,
+      back_pages: [overviewPage, taskPage],
       button_label: "下一步：查看判断规则",
       screen_class: "instruction-screen"
     },
     {
       type: ExperimentScreenPlugin,
-      title: "矩阵、核查区域与判断规则",
-      content: taskRuleVisualContent(),
+      ...rulePage,
+      back_pages: [overviewPage, taskPage, auditAreaPage],
       button_label: "下一步：理解检查",
       screen_class: "instruction-screen"
     },
@@ -756,6 +759,7 @@ function buildTimeline(plan, assignment) {
       type: ExperimentScreenPlugin,
       title: "任务规则理解检查",
       content: "<div class=\"check-intro\"><p>请根据刚才的规则独立判断下面的位置。回答正确后才能继续。</p></div>",
+      back_pages: [overviewPage, taskPage, auditAreaPage, rulePage],
       button_label: "理解正确，继续",
       screen_class: "instruction-screen check-screen",
       check_question: instructionCheckQuestion(),
@@ -792,24 +796,28 @@ function buildTimeline(plan, assignment) {
     });
     if (phase === "ai") {
       const aiSpec = phaseTrials[0];
+      const phasePage = { title: intro.title, content: intro.content };
+      const aiRolePage = { title: "AI 如何辅助核查", content: aiRoleInstructionContent() };
+      const aiColorPage = { title: "AI 候选颜色说明", content: aiInstructionContent() };
+      const aiReliabilityPage = { title: "本阶段 AI 的历史正确率", content: aiReliabilityInstructionContent(aiSpec) };
       timeline.push({
         type: ExperimentScreenPlugin,
-        title: "AI 如何辅助核查",
-        content: aiRoleInstructionContent(),
+        ...aiRolePage,
+        back_pages: [phasePage],
         button_label: "下一步：了解候选颜色",
         screen_class: "instruction-screen"
       });
       timeline.push({
         type: ExperimentScreenPlugin,
-        title: "AI 候选颜色说明",
-        content: aiInstructionContent(),
+        ...aiColorPage,
+        back_pages: [phasePage, aiRolePage],
         button_label: "下一步：查看历史正确率",
         screen_class: "instruction-screen"
       });
       timeline.push({
         type: ExperimentScreenPlugin,
-        title: "本阶段 AI 的历史正确率",
-        content: aiReliabilityInstructionContent(aiSpec),
+        ...aiReliabilityPage,
+        back_pages: [phasePage, aiRolePage, aiColorPage],
         button_label: "下一步：理解两类信息",
         screen_class: "instruction-screen reliability-screen"
       });
@@ -817,6 +825,7 @@ function buildTimeline(plan, assignment) {
         type: ExperimentScreenPlugin,
         title: "如何理解颜色与历史正确率",
         content: aiCalibrationInstructionContent(aiSpec),
+        back_pages: [phasePage, aiRolePage, aiColorPage, aiReliabilityPage],
         button_label: skipPractice ? "进入预测试区组" : "开始 AI 练习",
         screen_class: "instruction-screen reliability-screen"
       });

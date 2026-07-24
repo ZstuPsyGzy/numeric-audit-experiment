@@ -97,7 +97,7 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .timeline-panel { width: min(1080px, 100%); border: 1px solid var(--line); background: #fff; }
 .timeline-panel > h1 { margin: 0; padding: 22px 28px; border-bottom: 1px solid var(--line); font-size: 25px; }
 .timeline-content { padding: 26px 28px; }
-.timeline-actions { padding: 18px 28px; border-top: 1px solid var(--line); text-align: right; }
+.timeline-actions { padding: 18px 28px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 12px; }
 .instruction-prose { max-width: 900px; margin: 0 auto; }
 .instruction-lead { margin: 0 0 24px; color: #30373d; font-size: 16px; line-height: 1.85; }
 .task-definition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border: 1px solid var(--line); background: var(--line); }
