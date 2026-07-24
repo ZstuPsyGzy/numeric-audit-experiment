@@ -66,6 +66,7 @@ export class NumericAuditPlugin {
     const ratings = {};
     let judgment = null;
     let judgmentAt = null;
+    let ratingSubmittedAt = null;
     let fixationActualDuration = null;
     const cueStatusHtml = (() => {
       if (!spec.ai_present) return "本阶段不提供 AI 分析";
@@ -316,7 +317,7 @@ export class NumericAuditPlugin {
         first_click_rt_ms: firstSelection?.rt_ms ?? null,
         localization_rt_ms: round(judgmentAt),
         judgment_rt_ms: round(judgmentAt),
-        rating_rt_ms: trial.ask_ratings ? round(endedAt - judgmentAt) : null,
+        rating_rt_ms: trial.ask_ratings && ratingSubmittedAt !== null ? round(ratingSubmittedAt - judgmentAt) : null,
         total_rt_ms: round(endedAt),
         fixation_planned_ms: 500,
         fixation_actual_ms: fixationActualDuration === null ? null : round(fixationActualDuration),
@@ -346,6 +347,7 @@ export class NumericAuditPlugin {
       const judgmentCorrect = judgment === spec.correct_judgment;
       trialScreen.classList.add("post-response-stage");
       responseMain.hidden = true;
+      ratingSection.hidden = true;
       feedbackSection.hidden = false;
       const status = localizationCorrect && judgmentCorrect ? "回答正确。" : "本题尚未完全正确。";
       const truth = spec.target_count === 0
@@ -393,7 +395,11 @@ export class NumericAuditPlugin {
         }
         list.append(row);
       });
-      ratingSection.querySelector(".submit-rating").addEventListener("click", showFixationThenFinish, { once: true });
+      ratingSection.querySelector(".submit-rating").addEventListener("click", () => {
+        ratingSubmittedAt = activeElapsed();
+        if (trial.practice) showFeedback();
+        else showFixationThenFinish();
+      }, { once: true });
     };
 
     displayElement.querySelectorAll("[data-judgment]").forEach(button => {
@@ -409,8 +415,8 @@ export class NumericAuditPlugin {
         }
         judgment = value;
         judgmentAt = activeElapsed();
-        if (trial.practice) showFeedback();
-        else if (trial.ask_ratings) showRatings();
+        if (trial.ask_ratings) showRatings();
+        else if (trial.practice) showFeedback();
         else showFixationThenFinish();
       });
     });

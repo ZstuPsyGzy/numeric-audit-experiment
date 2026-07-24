@@ -462,7 +462,7 @@ function prepareNumericTrial(spec, options, assignment) {
     spec,
     material,
     practice: Boolean(options.practice),
-    ask_ratings: !options.practice,
+    ask_ratings: true,
     instruction_html: options.instructionHtml || "",
     progress_current: options.progressCurrent || 0,
     progress_total: options.progressTotal || 0,
@@ -730,7 +730,9 @@ function practiceLoop(phase, formalPlan, assignment) {
       instructionHtml: instructionContent(phase, reliabilitySpec)
     }, assignment)),
     loop_function: data => {
-      const rows = data.values().filter(row => row.trial_kind === "numeric_audit" && row.practice);
+      const rows = data.values()
+        .filter(row => row.trial_kind === "numeric_audit" && row.practice)
+        .slice(-specs.length);
       const correct = rows.filter(row => row.fully_correct).length;
       practiceState.lastAccuracy = rows.length ? correct / rows.length : 0;
       practiceState.attempt += 1;
