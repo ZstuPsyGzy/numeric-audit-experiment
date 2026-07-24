@@ -74,8 +74,8 @@ export class NumericAuditPlugin {
         material.lightCue ? '<span><i class="cue-key light"></i>浅红候选</span>' : ""
       ].filter(Boolean).join("");
       const label = material.deepCue || material.lightCue
-        ? "AI 分析已完成：已发现目标"
-        : "AI 分析已完成：未发现目标";
+        ? "AI 分析已完成：已生成候选提示"
+        : "AI 分析已完成：本次未生成候选提示";
       return `<span class="analysis-done">${label}</span>${cueItems}`;
     })();
 

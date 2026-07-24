@@ -257,10 +257,28 @@ function taskRuleVisualContent() {
   </div>`;
 }
 
+function aiRoleInstructionContent() {
+  return `<div class="ai-instruction-layout">
+    <section>
+      <p class="instruction-lead">本阶段将提供一个由过往数字核查数据训练的 AI 模型辅助你完成任务。</p>
+      <div class="ai-cue-example" aria-label="AI 分析数字矩阵并生成候选位置的示意">
+        <span>6</span><span>8</span><span>7</span>
+        <span>5</span><span class="deep-candidate">4</span><span>6</span>
+        <span>9</span><span>3</span><span>8</span>
+      </div>
+    </section>
+    <section class="ai-explanation-list">
+      <div class="cue-explanation"><p><strong>AI 提供候选位置</strong><br>模型会分析数字矩阵，并标出它认为值得优先核查的位置。</p></div>
+      <div class="cue-explanation"><p><strong>AI 不直接给出答案</strong><br>候选提示不代表该位置一定是目标，也不直接判断整张矩阵是否合规。</p></div>
+      <div class="ai-boundary-note"><strong>最终判断由你完成</strong><p>请根据上下左右关系规则核查候选位置及其他位置，再完成最终判断。</p></div>
+    </section>
+  </div>`;
+}
+
 function aiInstructionContent() {
   return `<div class="ai-instruction-layout">
     <section>
-      <p class="instruction-lead">我们基于过往数字核查数据训练了一个 AI 模型。模型会分析矩阵中的位置，并提示最值得优先核查的候选。</p>
+      <p class="instruction-lead">AI 会用不同深浅的淡红底纹表示候选优先级。</p>
       <div class="ai-cue-example" aria-label="AI 深红和浅红底纹候选示意">
         <span>6</span><span class="deep-candidate">8</span><span>7</span>
         <span>5</span><span>4</span><span class="light-candidate">6</span>
@@ -277,8 +295,12 @@ function aiInstructionContent() {
 
 function instructionContent(phase, reliabilitySpec = null) {
   const aiSections = phase === "ai" ? `
-    <section><h2>AI 辅助说明</h2>${aiInstructionContent()}</section>
-    ${reliabilitySpec ? `<section><h2>本组 AI 历史正确率</h2>${aiReliabilityInstructionContent(reliabilitySpec)}</section>` : ""}` : "";
+    <section><h2>AI 的作用</h2>${aiRoleInstructionContent()}</section>
+    <section><h2>AI 候选颜色</h2>${aiInstructionContent()}</section>
+    ${reliabilitySpec ? `
+      <section><h2>本阶段 AI 的历史正确率</h2>${aiReliabilityInstructionContent(reliabilitySpec)}</section>
+      <section><h2>如何理解两类信息</h2>${aiCalibrationInstructionContent(reliabilitySpec)}</section>
+    ` : ""}` : "";
   return `<div class="practice-guide">
     <section><h2>任务说明</h2>${taskIntroductionContent()}</section>
     <section><h2>核查区域说明</h2>${auditAreaInstructionContent()}</section>
@@ -305,7 +327,7 @@ function phaseIntro(phase) {
   }
   return {
     title: "AI 辅助审核阶段",
-    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示深红和/或浅红候选；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>根据实验安排，每位参与者只使用一种 AI 配置。下一页将说明你本阶段所用 AI 的历史表现，随后进行一次 5-trial AI 熟悉练习。</p></div>`
+    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示深红和/或浅红候选；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>根据实验安排，每位参与者只使用一种 AI 配置。接下来将依次说明 AI 的作用、候选颜色和历史表现，随后进行一次 5-trial AI 熟悉练习。</p></div>`
   };
 }
 
@@ -325,7 +347,7 @@ function aiReliabilityInstructionContent(spec) {
     <p class="instruction-lead">以下历史正确率适用于你接下来整个 AI 阶段，并在所有矩阵规模中保持不变。</p>
     <div class="reliability-definition">
       <section><strong>历史正确率如何计算</strong><p>当某种颜色候选出现时，如果它所在的位置确实是目标，就记为一次正确；如果它标在正常位置上，就记为一次错误。</p></section>
-      <section><strong>颜色与正确率是两件事</strong><p>深红表示模型给出的第一核查优先级，浅红表示第二核查优先级；历史正确率反映这些候选过去的实际表现。</p></section>
+      <section><strong>如何理解百分比</strong><p>90% 表示过去每 10 个同类候选中平均约有 9 个是真实目标；70% 表示平均约有 7 个是真实目标。</p></section>
     </div>
     <div class="reliability-condition-card">
       <div>
@@ -345,11 +367,15 @@ function aiReliabilityInstructionContent(spec) {
   </div>`;
 }
 
-function reliabilityCheckOptions() {
-  return Object.values(AI_CONDITIONS).map(condition => ({
-    value: condition.key,
-    label: `深红 ${Math.round(condition.deep_validity * 100)}% / 浅红 ${Math.round(condition.light_validity * 100)}%`
-  }));
+function aiCalibrationInstructionContent(spec) {
+  return `<div class="reliability-instruction">
+    <p class="instruction-lead">颜色深浅和历史正确率来自两个不同环节，请结合两类信息理解 AI 提示。</p>
+    <div class="reliability-definition">
+      <section><strong>颜色深浅：模型当前的判断</strong><p>深红表示模型认为更值得优先核查，浅红表示模型认为也值得核查。这是模型分析当前矩阵后给出的候选优先级。</p></section>
+      <section><strong>历史正确率：过去的实际表现</strong><p>研究人员使用标准答案核验后发现，深红候选过去约有 ${Math.round(spec.deep_validity * 100)}% 位于真实目标位置，浅红候选过去约有 ${Math.round(spec.light_validity * 100)}% 位于真实目标位置。</p></section>
+    </div>
+    <div class="ai-boundary-note"><strong>两者不一定一致</strong><p>颜色是 AI 自己对当前候选的判断，百分比是该类候选过去实际有多准确。因此，颜色较深不一定代表它过去的实际正确率更高。请结合候选提示、历史表现和你自己的核查结果作答。</p></div>
+  </div>`;
 }
 
 function blockIntro(spec, trialCount) {
@@ -767,22 +793,31 @@ function buildTimeline(plan, assignment) {
       const aiSpec = phaseTrials[0];
       timeline.push({
         type: ExperimentScreenPlugin,
-        title: "AI 候选提示说明",
+        title: "AI 如何辅助核查",
+        content: aiRoleInstructionContent(),
+        button_label: "下一步：了解候选颜色",
+        screen_class: "instruction-screen"
+      });
+      timeline.push({
+        type: ExperimentScreenPlugin,
+        title: "AI 候选颜色说明",
         content: aiInstructionContent(),
         button_label: "下一步：查看历史正确率",
         screen_class: "instruction-screen"
       });
       timeline.push({
         type: ExperimentScreenPlugin,
-        title: "本组 AI 的历史正确率",
+        title: "本阶段 AI 的历史正确率",
         content: aiReliabilityInstructionContent(aiSpec),
-        button_label: skipPractice ? "理解正确，进入预测试区组" : "理解正确，开始 AI 练习",
-        screen_class: "instruction-screen check-screen reliability-screen",
-        check_question: "<p>你在本阶段使用的 AI，深红候选和浅红候选的历史正确率分别是多少？</p>",
-        check_options: reliabilityCheckOptions(),
-        check_correct: aiSpec.condition_key,
-        check_success: `回答正确：深红 ${Math.round(aiSpec.deep_validity * 100)}%，浅红 ${Math.round(aiSpec.light_validity * 100)}%。`,
-        check_error: "请重新查看上方两种颜色候选对应的历史正确率。"
+        button_label: "下一步：理解两类信息",
+        screen_class: "instruction-screen reliability-screen"
+      });
+      timeline.push({
+        type: ExperimentScreenPlugin,
+        title: "如何理解颜色与历史正确率",
+        content: aiCalibrationInstructionContent(aiSpec),
+        button_label: skipPractice ? "进入预测试区组" : "开始 AI 练习",
+        screen_class: "instruction-screen reliability-screen"
       });
     }
     if (!skipPractice) {
