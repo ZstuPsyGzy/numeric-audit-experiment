@@ -57,41 +57,72 @@ function matrixRepetitionScore(matrix) {
   return Math.round(score * 10) / 10;
 }
 
+function sortedPairKey(first, second) {
+  return first < second ? `${first},${second}` : `${second},${first}`;
+}
+
+function sharedDigitCount(verticalFirst, verticalSecond, horizontalFirst, horizontalSecond) {
+  const vertical = [verticalFirst, verticalSecond];
+  const horizontal = [horizontalFirst, horizontalSecond];
+  let shared = 0;
+  for (const value of new Set(vertical)) {
+    shared += Math.min(
+      vertical.filter(item => item === value).length,
+      horizontal.filter(item => item === value).length
+    );
+  }
+  return shared;
+}
+
+function relationPairScore(matrix, effectiveSize, targetKeys) {
+  let swappedPairCount = 0;
+  let sharedDigitTotal = 0;
+  for (const position of validPositions(effectiveSize)) {
+    if (targetKeys.has(positionKey(position))) continue;
+    const top = matrix[position.row - 1][position.col];
+    const bottom = matrix[position.row + 1][position.col];
+    const left = matrix[position.row][position.col - 1];
+    const right = matrix[position.row][position.col + 1];
+    if (top + bottom !== left + right) continue;
+    if (sortedPairKey(top, bottom) === sortedPairKey(left, right)) swappedPairCount += 1;
+    sharedDigitTotal += sharedDigitCount(top, bottom, left, right);
+  }
+  return {
+    swappedPairCount,
+    sharedDigitTotal,
+    score: swappedPairCount * 1000 + sharedDigitTotal * 10
+  };
+}
+
 function generateNumberMatrix(effectiveSize, targetCount, rng) {
   const matrixSize = effectiveSize + 2;
   let bestCandidate = null;
   let bestScore = Infinity;
   let firstExactAttempt = null;
   let exactCount = 0;
-  for (let attempt = 0; attempt < 3000; attempt += 1) {
+  for (let attempt = 0; attempt < 50000; attempt += 1) {
     const targetPositions = shuffle(validPositions(effectiveSize), rng).slice(0, targetCount);
     const targetKeys = new Set(targetPositions.map(positionKey));
     const targetSigns = new Map(targetPositions.map(position => [
       positionKey(position),
       rng() < 0.5 ? -1 : 1
     ]));
-    const diagonalA = Array.from({ length: 2 * matrixSize - 1 }, () => randomInt(rng, 2));
-    const diagonalB = Array.from({ length: 2 * matrixSize - 1 }, () => randomInt(rng, 2));
-    const base = Array.from({ length: matrixSize }, (_, row) =>
-      Array.from({ length: matrixSize }, (_, col) =>
-        diagonalA[row + col] + diagonalB[row - col + matrixSize - 1]
-      )
-    );
-
-    const impulse = Array.from({ length: matrixSize }, () => Array(matrixSize).fill(0));
+    const raw = Array.from({ length: matrixSize }, () => Array(matrixSize).fill(null));
+    raw[0] = Array.from({ length: matrixSize }, () => randomInt(rng, 5));
+    raw[1] = Array.from({ length: matrixSize }, () => randomInt(rng, 5));
     for (let row = 1; row < matrixSize - 1; row += 1) {
+      if (row + 1 > 1) {
+        raw[row + 1][0] = randomInt(rng, 5);
+        raw[row + 1][matrixSize - 1] = randomInt(rng, 5);
+      }
       for (let col = 1; col < matrixSize - 1; col += 1) {
         const desired = targetSigns.get(`${row},${col}`) || 0;
-        impulse[row + 1][col] = impulse[row][col - 1]
-          + impulse[row][col + 1]
-          - impulse[row - 1][col]
+        raw[row + 1][col] = raw[row][col - 1]
+          + raw[row][col + 1]
+          - raw[row - 1][col]
           + desired;
       }
     }
-
-    const raw = base.map((row, rowIndex) =>
-      row.map((value, colIndex) => value + impulse[rowIndex][colIndex])
-    );
     const minimum = Math.min(...raw.flat());
     const maximum = Math.max(...raw.flat());
     if (maximum - minimum > 8) continue;
@@ -106,16 +137,29 @@ function generateNumberMatrix(effectiveSize, targetCount, rng) {
       && detected.every(position => targetKeys.has(positionKey(position)));
     if (exact) {
       const repetitionScore = matrixRepetitionScore(matrix);
+      const pairScore = relationPairScore(matrix, effectiveSize, targetKeys);
+      const materialScore = pairScore.score + repetitionScore;
       exactCount += 1;
       if (firstExactAttempt === null) firstExactAttempt = attempt;
-      if (repetitionScore < bestScore) {
-        bestScore = repetitionScore;
-        bestCandidate = { matrix, matrixSize, targetPositions, repetitionScore };
+      if (materialScore < bestScore) {
+        bestScore = materialScore;
+        bestCandidate = {
+          matrix,
+          matrixSize,
+          targetPositions,
+          repetitionScore,
+          relationPairScore: pairScore.score,
+          swappedPairCount: pairScore.swappedPairCount,
+          sharedDigitTotal: pairScore.sharedDigitTotal
+        };
       }
       if (
-        repetitionScore <= matrixSize * 4
-        || exactCount >= 30
-        || attempt - firstExactAttempt >= 220
+        pairScore.swappedPairCount === 0
+        && (
+          repetitionScore <= matrixSize * 8
+          || exactCount >= 12
+          || attempt - firstExactAttempt >= 300
+        )
       ) {
         return bestCandidate;
       }
