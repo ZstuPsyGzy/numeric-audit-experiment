@@ -101,8 +101,8 @@ export class NumericAuditPlugin {
               <div class="selection-count">已选择 <strong data-selection-count>0</strong> 个位置</div>
               <div class="judgment-block">
                 <div class="judgment-actions">
-                  <button type="button" data-judgment="compliant"><strong class="key-emphasis">合规</strong><span>未发现目标</span></button>
-                  <button type="button" data-judgment="noncompliant"><strong class="key-emphasis">不合规</strong><span>发现一个或多个目标</span></button>
+                  <button type="button" data-judgment="compliant"><strong>合规</strong><span>未发现目标</span></button>
+                  <button type="button" data-judgment="noncompliant"><strong>不合规</strong><span>发现一个或多个目标</span></button>
                 </div>
                 <p class="response-message" role="status"></p>
               </div>

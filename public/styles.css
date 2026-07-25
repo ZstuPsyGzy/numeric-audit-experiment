@@ -364,14 +364,7 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
   gap: var(--matrix-gap);
 }
 .number-matrix::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  inset: var(--audit-region-inset, 20%);
-  border: 1px solid rgba(57, 65, 72, 0.10);
-  border-radius: 5px;
-  background: rgba(57, 65, 72, 0.055);
+  content: none;
 }
 .number-matrix.matrix-size-5 { --matrix-size: 5; }
 .number-matrix.matrix-size-7 { --matrix-size: 7; }
@@ -394,7 +387,8 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
   line-height: 1;
 }
 .number-cell:disabled { opacity: 1; color: #050607; cursor: default; -webkit-text-fill-color: #050607; }
-.number-cell.selectable:hover { background: #f0f3f5; }
+.number-cell.selectable { border-color: rgba(57, 65, 72, .12); background: rgba(57, 65, 72, .075); }
+.number-cell.selectable:hover { background: rgba(57, 65, 72, .12); }
 .number-cell.selectable:focus-visible { outline: 3px solid #6ba7d1; outline-offset: 1px; }
 .number-cell.selected { border-color: var(--blue); background: var(--blue-soft); }
 .number-cell.selected::after { content: "✓"; position: absolute; right: 3px; bottom: 2px; color: var(--blue); font-size: 12px; }
@@ -414,8 +408,8 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .selection-count { margin: 0; padding: 17px 12px; background: var(--soft); color: #454d55; text-align: center; font-size: 12px; }
 .selection-count strong { color: var(--blue); font-size: 17px; }
 .judgment-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.judgment-actions button { min-height: 68px; padding: 10px; border: 2px solid rgba(167, 25, 32, .25); border-radius: 5px; background: #fff8f8; color: var(--ink); }
-.judgment-actions button:hover { border-color: var(--red); background: #fff1f1; }
+.judgment-actions button { min-height: 68px; padding: 10px; border: 2px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); }
+.judgment-actions button:hover { border-color: var(--blue); background: #f8fbfd; }
 .judgment-actions strong, .judgment-actions span { display: block; }
 .judgment-actions strong { font-size: 17px; }
 .judgment-actions span { margin-top: 5px; color: #4a5259; font-size: 10px; font-weight: 700; }
