@@ -197,11 +197,11 @@ function neighborCheckExample() {
 function auditAreaInstructionContent() {
   return `<div class="audit-area-layout">
     <section class="audit-area-copy">
-      <p class="instruction-lead">不同 trial 中，矩阵规模可能不同；这只表示需要核查的位置数量不同，判断规则始终不变。</p>
+      <p class="instruction-lead">不同 trial 中，矩阵规模可能不同；这只表示<strong class="key-emphasis">需要核查的位置数量不同</strong>，判断规则始终不变。</p>
       <div class="audit-rule-cards">
-        <section><strong>只核查中间底纹区域</strong><p>带淡灰底纹的位置是需要审核、可以点击的位置。最外圈数字只是关系计算时的参考数字。</p></section>
-        <section><strong>每次只看一个位置</strong><p>判断某个位置时，只比较这个位置的上、下、左、右四个相邻数字。</p></section>
-        <section><strong>规则不会随矩阵变大而改变</strong><p>矩阵变大时，需要重复核查的位置更多；但每一个位置仍然只看上下左右。</p></section>
+        <section><strong>只核查中间底纹区域</strong><p>带淡灰底纹的位置是<strong class="key-emphasis">需要审核、可以点击</strong>的位置。最外圈数字只是关系计算时的参考数字。</p></section>
+        <section><strong>每次只看一个位置</strong><p>判断某个位置时，只比较这个位置的<strong class="key-emphasis">上、下、左、右</strong>四个相邻数字。</p></section>
+        <section><strong>规则不会随矩阵变大而改变</strong><p>矩阵变大时，需要重复核查的位置更多；但每一个位置仍然<strong class="key-emphasis">只看上下左右</strong>。</p></section>
       </div>
     </section>
     <section class="audit-area-examples" aria-label="不同规模矩阵示意">
@@ -220,17 +220,17 @@ function auditAreaInstructionContent() {
 
 function taskIntroductionContent() {
   return `<div class="instruction-prose">
-    <p class="instruction-lead">你将看到一个数字矩阵。任务是核查矩阵内部的每一个有效位置，找出是否存在不满足上下左右关系规则的目标。</p>
+    <p class="instruction-lead">你将看到一个数字矩阵。任务是核查矩阵内部的每一个有效位置，找出是否存在<strong class="key-emphasis">不满足上下左右关系规则的目标</strong>。</p>
     <div class="task-definition-grid">
-      <section><strong>需要核查什么</strong><p>矩阵内部带有淡灰底纹的可点击位置构成核查区域。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
-      <section><strong>什么是目标</strong><p>对某个核查位置，如果“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”，该位置就是目标。</p></section>
-      <section><strong>怎样作答</strong><p>先点击发现的全部目标，再判断整张矩阵“合规”或“不合规”。</p></section>
+      <section><strong>需要核查什么</strong><p>矩阵内部带有淡灰底纹的可点击位置构成<strong class="key-emphasis">核查区域</strong>。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
+      <section><strong>什么是目标</strong><p>对某个核查位置，如果<strong class="key-emphasis">“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”</strong>，该位置就是目标。</p></section>
+      <section><strong>怎样作答</strong><p><strong class="key-emphasis">先点击发现的全部目标</strong>，再判断整张矩阵<strong class="key-emphasis">“合规”或“不合规”</strong>。</p></section>
     </div>
     <div class="response-definition">
-      <span><b>合规</b>：没有发现目标</span>
-      <span><b>不合规</b>：发现一个或多个目标</span>
+      <span><b class="key-emphasis">合规</b>：没有发现目标</span>
+      <span><b class="key-emphasis">不合规</b>：发现一个或多个目标</span>
     </div>
-    <div class="ai-boundary-note"><strong>任务要求</strong><p>请在保证准确的前提下尽可能快速完成任务。</p></div>
+    <div class="ai-boundary-note"><strong>任务要求</strong><p>请在<strong class="key-emphasis">保证准确</strong>的前提下<strong class="key-emphasis">尽可能快速</strong>完成任务。</p></div>
   </div>`;
 }
 
@@ -240,12 +240,12 @@ function experimentFlowContent() {
     <ol class="experiment-flow-grid">
       <li><span class="flow-index">1</span><div><strong>学习任务规则</strong><p>阅读数字矩阵、核查区域和目标判断规则，并完成一道理解检查。</p></div></li>
       <li><span class="flow-index">2</span><div><strong>显示与尺寸校准</strong><p>进入全屏，完成简单的颜色辨认和实体卡片尺寸校准。</p></div></li>
-      <li><span class="flow-index">3</span><div><strong>独立审核阶段</strong><p>先完成无 AI 练习，再独立完成数字矩阵核查任务。</p></div></li>
-      <li><span class="flow-index">4</span><div><strong>AI 辅助审核阶段</strong><p>阅读 AI 候选提示说明，完成 AI 练习和 AI 辅助核查任务。</p></div></li>
+      <li><span class="flow-index">3</span><div><strong>独立审核阶段</strong><p>先完成无 AI 练习，再<strong class="key-emphasis">独立完成数字矩阵核查任务</strong>。</p></div></li>
+      <li><span class="flow-index">4</span><div><strong>AI 辅助审核阶段</strong><p>阅读 AI 候选提示说明，完成 AI 练习和<strong class="key-emphasis">AI 辅助核查任务</strong>。</p></div></li>
       <li><span class="flow-index">5</span><div><strong>阶段评价</strong><p>在实验区组结束后，报告本阶段的任务负荷及辅助系统使用感受。</p></div></li>
       <li><span class="flow-index">6</span><div><strong>实验后问卷</strong><p>完成简短问卷，最后生成并保存匿名实验数据文件。</p></div></li>
     </ol>
-    <div class="ai-boundary-note"><strong>请按页面顺序完成</strong><p>实验过程中请保持全屏并独立作答。每个阶段开始前，程序都会再次显示相应说明。</p></div>
+    <div class="ai-boundary-note"><strong>请按页面顺序完成</strong><p>实验过程中请<strong class="key-emphasis">保持全屏</strong>并<strong class="key-emphasis">独立作答</strong>。每个阶段开始前，程序都会再次显示相应说明。</p></div>
   </div>`;
 }
 
@@ -260,11 +260,11 @@ function taskRuleVisualContent() {
       <h2>示例位置的判断</h2>
       <div class="calculation-row vertical-calc"><span>上 + 下</span><strong>4 + 3 = 7</strong></div>
       <div class="calculation-row horizontal-calc"><span>左 + 右</span><strong>2 + 4 = 6</strong></div>
-      <div class="calculation-result"><b>7 ≠ 6</b><span>因此，该位置是目标</span></div>
+      <div class="calculation-result"><b>7 ≠ 6</b><span>因此，该位置是<strong class="key-emphasis">目标</strong></span></div>
       <ol class="instruction-steps compact-steps">
         <li><span>1</span>核查内部位置的上下左右数字。</li>
-        <li><span>2</span>发现目标时，点击该位置进行标记。</li>
-        <li><span>3</span>完成搜索后，再判断整张矩阵是否合规。</li>
+        <li><span>2</span>发现目标时，<strong class="key-emphasis">点击该位置</strong>进行标记。</li>
+        <li><span>3</span>完成搜索后，再判断整张矩阵是否<strong class="key-emphasis">合规</strong>。</li>
       </ol>
     </section>
   </div>`;
@@ -273,7 +273,7 @@ function taskRuleVisualContent() {
 function aiRoleInstructionContent() {
   return `<div class="ai-instruction-layout">
     <section>
-      <p class="instruction-lead">本阶段将提供一个由过往数字核查数据训练的 AI 模型辅助你完成任务。</p>
+      <p class="instruction-lead">本阶段将提供一个由过往数字核查数据训练的 <strong class="key-emphasis">AI 模型</strong>辅助你完成任务。</p>
       <div class="ai-cue-example" aria-label="AI 分析数字矩阵并生成候选位置的示意">
         <span>6</span><span>8</span><span>7</span>
         <span>5</span><span class="deep-candidate">4</span><span>6</span>
@@ -281,9 +281,9 @@ function aiRoleInstructionContent() {
       </div>
     </section>
     <section class="ai-explanation-list">
-      <div class="cue-explanation"><p><strong>AI 提供候选位置</strong><br>模型会分析数字矩阵，并标出它认为值得优先核查的位置。</p></div>
-      <div class="cue-explanation"><p><strong>AI 不直接给出答案</strong><br>候选提示不代表该位置一定是目标，也不直接判断整张矩阵是否合规。</p></div>
-      <div class="ai-boundary-note"><strong>最终判断由你完成</strong><p>请根据上下左右关系规则核查候选位置及其他位置，再完成最终判断。</p></div>
+      <div class="cue-explanation"><p><strong>AI 提供候选位置</strong><br>模型会分析数字矩阵，并标出它认为<strong class="key-emphasis">值得优先核查</strong>的位置。</p></div>
+      <div class="cue-explanation"><p><strong>AI 不直接给出答案</strong><br>候选提示不代表该位置一定是目标，也不直接判断整张矩阵是否<strong class="key-emphasis">合规</strong>。</p></div>
+      <div class="ai-boundary-note"><strong>最终判断由你完成</strong><p>请根据上下左右关系规则核查候选位置及其他位置，再完成<strong class="key-emphasis">最终判断</strong>。</p></div>
     </section>
   </div>`;
 }
@@ -291,7 +291,7 @@ function aiRoleInstructionContent() {
 function aiInstructionContent() {
   return `<div class="ai-instruction-layout">
     <section>
-      <p class="instruction-lead">AI 会用不同深浅的淡红底纹表示候选优先级。</p>
+      <p class="instruction-lead">AI 会用不同深浅的淡红底纹表示<strong class="key-emphasis">候选优先级</strong>。</p>
       <div class="ai-cue-example" aria-label="AI 深红和浅红底纹候选示意">
         <span>6</span><span class="deep-candidate">8</span><span>7</span>
         <span>5</span><span>4</span><span class="light-candidate">6</span>
@@ -299,9 +299,9 @@ function aiInstructionContent() {
       </div>
     </section>
     <section class="ai-explanation-list">
-      <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>较深的淡红底纹</strong><br>模型认为最值得优先核查的位置。</p></div>
-      <div class="cue-explanation"><i class="cue-key light"></i><p><strong>较浅的淡红底纹</strong><br>模型认为也值得核查的位置。</p></div>
-      <div class="ai-boundary-note"><strong>请注意</strong><p>深红和浅红候选不会指向同一个位置。AI 只帮助安排核查顺序，不直接给出最终答案；候选可能正确，也可能把正常位置标出来，最终判断仍由你完成。</p></div>
+      <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>较深的淡红底纹</strong><br>模型认为<strong class="key-emphasis">最值得优先核查</strong>的位置。</p></div>
+      <div class="cue-explanation"><i class="cue-key light"></i><p><strong>较浅的淡红底纹</strong><br>模型认为<strong class="key-emphasis">也值得核查</strong>的位置。</p></div>
+      <div class="ai-boundary-note"><strong>请注意</strong><p>深红和浅红候选<strong class="key-emphasis">不会指向同一个位置</strong>。AI 只帮助安排核查顺序，不直接给出最终答案；候选可能正确，也可能把正常位置标出来，最终判断仍由你完成。</p></div>
     </section>
   </div>`;
 }
@@ -335,12 +335,12 @@ function phaseIntro(phase) {
   if (phase === "baseline") {
     return {
       title: "独立审核阶段",
-      content: `<div class="phase-intro"><p>本阶段不显示任何 AI 候选，用于测量你尚未接触 AI 提示时的独立审核表现。</p><p>实验首先进行一次任务规则练习，共 5 个 trial。练习正确率达到 80% 后进入无 AI 正式基线；后续无 AI block 不再重复练习。</p></div>`
+    content: `<div class="phase-intro"><p>本阶段<strong class="key-emphasis">不显示任何 AI 候选</strong>，用于测量你尚未接触 AI 提示时的独立审核表现。</p><p>实验首先进行一次任务规则练习，共 5 个 trial。练习正确率达到 <strong class="key-emphasis">80%</strong> 后进入无 AI 正式基线；后续无 AI block 不再重复练习。</p></div>`
     };
   }
   return {
     title: "AI 辅助审核阶段",
-    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示深红和/或浅红候选；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>根据实验安排，每位参与者只使用一种 AI 配置。接下来将依次说明 AI 的作用、候选颜色和历史表现，随后进行一次 5-trial AI 熟悉练习。</p></div>`
+    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示<strong class="key-emphasis">深红和/或浅红候选</strong>；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>根据实验安排，每位参与者只使用一种 <strong class="key-emphasis">AI 配置</strong>。接下来将依次说明 AI 的作用、候选颜色和历史表现，随后进行一次 5-trial AI 熟悉练习。</p></div>`
   };
 }
 
@@ -357,10 +357,10 @@ function reliabilityUnits(value, colorClass) {
 
 function aiReliabilityInstructionContent(spec) {
   return `<div class="reliability-instruction">
-    <p class="instruction-lead">以下历史正确率适用于你接下来整个 AI 阶段，并在所有矩阵规模中保持不变。</p>
+    <p class="instruction-lead">以下<strong class="key-emphasis">历史正确率</strong>适用于你接下来整个 AI 阶段，并在所有矩阵规模中保持不变。</p>
     <div class="reliability-definition">
-      <section><strong>历史正确率如何计算</strong><p>当某种颜色候选出现时，如果它所在的位置确实是目标，就记为一次正确；如果它标在正常位置上，就记为一次错误。</p></section>
-      <section><strong>如何理解百分比</strong><p>90% 表示过去每 10 个同类候选中平均约有 9 个是真实目标；70% 表示平均约有 7 个是真实目标。</p></section>
+      <section><strong>历史正确率如何计算</strong><p>当某种颜色候选出现时，如果它所在的位置确实是<strong class="key-emphasis">目标</strong>，就记为一次正确；如果它标在<strong class="key-emphasis">正常位置</strong>上，就记为一次错误。</p></section>
+      <section><strong>如何理解百分比</strong><p><strong class="key-emphasis">90%</strong> 表示过去每 10 个同类候选中平均约有 9 个是真实目标；<strong class="key-emphasis">70%</strong> 表示平均约有 7 个是真实目标。</p></section>
     </div>
     <div class="reliability-condition-card">
       <div>
@@ -376,18 +376,18 @@ function aiReliabilityInstructionContent(spec) {
         <p>每 10 次浅红候选中，约 ${Math.round(spec.light_validity * 10)} 次位于真实目标位置。</p>
       </div>
     </div>
-    <div class="ai-boundary-note"><strong>仍需自行核查</strong><p>历史正确率不代表当前候选一定正确，也不直接表示整张矩阵是否合规。请结合上下左右关系规则完成最终判断。</p></div>
+    <div class="ai-boundary-note"><strong>仍需自行核查</strong><p>历史正确率不代表当前候选一定正确，也不直接表示整张矩阵是否<strong class="key-emphasis">合规</strong>。请结合上下左右关系规则完成最终判断。</p></div>
   </div>`;
 }
 
 function aiCalibrationInstructionContent(spec) {
   return `<div class="reliability-instruction">
-    <p class="instruction-lead">颜色深浅和历史正确率来自两个不同环节，请结合两类信息理解 AI 提示。</p>
+    <p class="instruction-lead"><strong class="key-emphasis">颜色深浅</strong>和<strong class="key-emphasis">历史正确率</strong>来自两个不同环节，请结合两类信息理解 AI 提示。</p>
     <div class="reliability-definition">
-      <section><strong>颜色深浅：模型当前的判断</strong><p>深红表示模型认为更值得优先核查，浅红表示模型认为也值得核查。这是模型分析当前矩阵后给出的候选优先级。</p></section>
-      <section><strong>历史正确率：过去的实际表现</strong><p>研究人员使用标准答案核验后发现，深红候选过去约有 ${Math.round(spec.deep_validity * 100)}% 位于真实目标位置，浅红候选过去约有 ${Math.round(spec.light_validity * 100)}% 位于真实目标位置。</p></section>
+      <section><strong>颜色深浅：模型当前的判断</strong><p>深红表示模型认为<strong class="key-emphasis">更值得优先核查</strong>，浅红表示模型认为<strong class="key-emphasis">也值得核查</strong>。这是模型分析当前矩阵后给出的候选优先级。</p></section>
+      <section><strong>历史正确率：过去的实际表现</strong><p>研究人员使用标准答案核验后发现，深红候选过去约有 <strong class="key-emphasis">${Math.round(spec.deep_validity * 100)}%</strong> 位于真实目标位置，浅红候选过去约有 <strong class="key-emphasis">${Math.round(spec.light_validity * 100)}%</strong> 位于真实目标位置。</p></section>
     </div>
-    <div class="ai-boundary-note"><strong>两者不一定一致</strong><p>颜色是 AI 自己对当前候选的判断，百分比是该类候选过去实际有多准确。因此，颜色较深不一定代表它过去的实际正确率更高。请结合候选提示、历史表现和你自己的核查结果作答。</p></div>
+    <div class="ai-boundary-note"><strong>两者不一定一致</strong><p>颜色是 AI 自己对当前候选的判断，百分比是该类候选过去实际有多准确。因此，<strong class="key-emphasis">颜色较深不一定代表它过去的实际正确率更高</strong>。请结合候选提示、历史表现和你自己的核查结果作答。</p></div>
   </div>`;
 }
 
@@ -395,18 +395,18 @@ function blockIntro(spec, trialCount) {
   if (!spec.ai_present) {
     return {
       title: "无 AI · 独立审核",
-      content: `<div class="block-intro"><p>本组共 ${trialCount} 个 trial，不显示 AI 候选。</p><p>请保持准确，在确认后再提交判断。</p></div>`
+      content: `<div class="block-intro"><p>本组共 ${trialCount} 个 trial，<strong class="key-emphasis">不显示 AI 候选</strong>。</p><p>请保持准确，在确认后再提交判断。</p></div>`
     };
   }
   return {
     title: AI_CONDITIONS[spec.condition_key].label,
     content: `<div class="block-intro">
-      <p>本组共 ${trialCount} 个 trial。以下百分比表示：该颜色候选出现时，它落在真实目标位置上的历史比例。</p>
+      <p>本组共 ${trialCount} 个 trial。以下百分比表示：该颜色候选出现时，它<strong class="key-emphasis">落在真实目标位置上的历史比例</strong>。</p>
       <div class="validity-bars">
         ${validityBar("深红候选有效率", spec.deep_validity, "deep-fill")}
         ${validityBar("浅红候选有效率", spec.light_validity, "light-fill")}
       </div>
-      <p>颜色表示候选优先层级，百分比表示本组历史有效率；两者都不是最终答案。</p>
+      <p>颜色表示<strong class="key-emphasis">候选优先层级</strong>，百分比表示本组<strong class="key-emphasis">历史有效率</strong>；两者都不是最终答案。</p>
     </div>`
   };
 }

@@ -101,8 +101,8 @@ export class NumericAuditPlugin {
               <div class="selection-count">已选择 <strong data-selection-count>0</strong> 个位置</div>
               <div class="judgment-block">
                 <div class="judgment-actions">
-                  <button type="button" data-judgment="compliant"><strong>合规</strong><span>未发现目标</span></button>
-                  <button type="button" data-judgment="noncompliant"><strong>不合规</strong><span>发现一个或多个目标</span></button>
+                  <button type="button" data-judgment="compliant"><strong class="key-emphasis">合规</strong><span>未发现目标</span></button>
+                  <button type="button" data-judgment="noncompliant"><strong class="key-emphasis">不合规</strong><span>发现一个或多个目标</span></button>
                 </div>
                 <p class="response-message" role="status"></p>
               </div>
@@ -351,8 +351,8 @@ export class NumericAuditPlugin {
       feedbackSection.hidden = false;
       const status = localizationCorrect && judgmentCorrect ? "回答正确。" : "本题尚未完全正确。";
       const truth = spec.target_count === 0
-        ? "矩阵中没有目标，应选择“合规”，且不点击任何位置。"
-        : `矩阵中有 ${spec.target_count} 个目标，应点击全部目标并选择“不合规”。`;
+        ? '矩阵中没有目标，应选择 <strong class="key-emphasis">合规</strong>，且<strong class="key-emphasis">不点击任何位置</strong>。'
+        : `矩阵中有 ${spec.target_count} 个目标，应<strong class="key-emphasis">点击全部目标</strong>并选择 <strong class="key-emphasis">不合规</strong>。`;
       const aiFeedback = !spec.ai_present
         ? ""
         : spec.system_event === "false_alarm"
@@ -360,7 +360,7 @@ export class NumericAuditPlugin {
           : spec.system_event === "correct_rejection"
             ? " AI 此次没有标出候选，矩阵中也确实没有目标。"
             : " AI 候选覆盖了真实目标，但仍需按规则自行核查。";
-      feedbackSection.querySelector(".feedback-text").textContent = `${status}${truth}${aiFeedback}`;
+      feedbackSection.querySelector(".feedback-text").innerHTML = `${status}${truth}${aiFeedback}`;
       feedbackSection.querySelector(".feedback-continue").addEventListener("click", showFixationThenFinish, { once: true });
     };
 
@@ -406,11 +406,11 @@ export class NumericAuditPlugin {
       button.addEventListener("click", () => {
         const value = button.dataset.judgment;
         if (value === "noncompliant" && selected.size === 0) {
-          messageElement.textContent = "若判断为不合规，请先点击至少一个目标位置。";
+          messageElement.innerHTML = '若判断为 <strong class="key-emphasis">不合规</strong>，请先<strong class="key-emphasis">点击至少一个目标位置</strong>。';
           return;
         }
         if (value === "compliant" && selected.size > 0) {
-          messageElement.textContent = "若判断为合规，请先取消已选择的位置。";
+          messageElement.innerHTML = '若判断为 <strong class="key-emphasis">合规</strong>，请先<strong class="key-emphasis">取消已选择的位置</strong>。';
           return;
         }
         judgment = value;
