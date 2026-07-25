@@ -17,8 +17,10 @@ import { NumericAuditPlugin } from "./numeric-audit-plugin.js";
 import { PostQuestionnairePlugin } from "./post-questionnaire-plugin.js";
 import { ExperimentScreenPlugin } from "./screen-plugin.js";
 import { buildParticipantPlan, generateCanonicalPlan, validateTrialPlan } from "./trial-plan.js";
+import { createExportBundle, downloadCsv, downloadJson } from "./data-export.js";
 
-const mode = new URLSearchParams(location.search).get("mode") === "pilot" ? "pilot" : "formal";
+const requestedMode = new URLSearchParams(location.search).get("mode");
+const mode = requestedMode === "pilot" ? "pilot" : "formal";
 const skipPractice = mode === "pilot" && new URLSearchParams(location.search).get("skip_practice") === "1";
 const CONSENT_VERSION = "human-ai-consent-v3-2026-07-22";
 const BFI10_ITEMS = [
@@ -79,6 +81,7 @@ let fullscreenRequired = false;
 let browserCheckData = null;
 let consentAccepted = false;
 let consentAcceptedAt = null;
+let exportBundle = null;
 window.__fullscreenExitCount = 0;
 window.__visibilityHiddenCount = 0;
 
@@ -502,14 +505,23 @@ function storeTrialData(data, spec, assignment) {
     ai1_outcome: data.deep_outcome,
     ai2_outcome: data.light_outcome,
     response_method: "mouse_click",
+    hosting_platform: "github_pages",
+    session_id: session.session_id,
+    subject_code: session.subject_code,
+    age: session.client_meta.age,
+    gender: session.client_meta.gender,
+    handedness: session.client_meta.handedness,
+    vision: session.client_meta.vision,
+    consent_version: session.client_meta.consent_version,
+    consent_accepted_at: session.client_meta.consent_accepted_at,
     browser_check: browserCheckData,
     viewport_width: innerWidth,
     viewport_height: innerHeight,
     screen_width: screen.width,
     screen_height: screen.height
   };
-  enqueueTrial(session.session_id, record);
-  if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  Object.assign(data, record);
+  queueRecord(record);
 }
 
 function storeCalibrationData(data, assignment) {
@@ -529,6 +541,15 @@ function storeCalibrationData(data, assignment) {
     phase_order: assignment.phase_order,
     condition_order: assignment.condition_order,
     set_size_order: assignment.set_size_order,
+    hosting_platform: "github_pages",
+    session_id: session.session_id,
+    subject_code: session.subject_code,
+    age: session.client_meta.age,
+    gender: session.client_meta.gender,
+    handedness: session.client_meta.handedness,
+    vision: session.client_meta.vision,
+    consent_version: session.client_meta.consent_version,
+    consent_accepted_at: session.client_meta.consent_accepted_at,
     browser_check: browserCheckData,
     viewport_width: innerWidth,
     viewport_height: innerHeight,
@@ -536,8 +557,7 @@ function storeCalibrationData(data, assignment) {
     screen_height: screen.height
   };
   Object.assign(data, record);
-  enqueueTrial(session.session_id, record);
-  if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  queueRecord(record);
 }
 
 function reverseScore(value, maximum) {
@@ -546,6 +566,17 @@ function reverseScore(value, maximum) {
 
 function mean(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function queueRecord(record) {
+  try {
+    enqueueTrial(session.session_id, record);
+    if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  } catch (error) {
+    console.error("Data queue failed; timeline continues and upload will be checked at completion.", error);
+    window.__failedLocalRecords = window.__failedLocalRecords || [];
+    window.__failedLocalRecords.push(record);
+  }
 }
 
 function scoreQuestionnaire(questionnaireId, responses) {
@@ -622,8 +653,7 @@ function storeQuestionnaireData(data, assignment, context = {}) {
     screen_height: screen.height
   };
   Object.assign(data, record);
-  enqueueTrial(session.session_id, record);
-  if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  queueRecord(record);
 }
 
 function blockWorkloadTimeline(block, assignment, blockPosition, blockCount) {
@@ -892,8 +922,8 @@ function buildTimeline(plan, assignment) {
   timeline.push({
     type: ExperimentScreenPlugin,
     title: "实验全部完成",
-    content: "<div class=\"phase-intro\"><p>正式任务和实验后问卷均已完成。点击下方按钮退出全屏并确认数据上传。</p></div>",
-    button_label: "完成并上传"
+    content: "<div class=\"phase-intro\"><p>正式任务和实验后问卷均已完成。点击下方按钮退出全屏并生成实验数据文件。</p></div>",
+    button_label: "完成并生成数据"
   });
   timeline.push({
     type: window.jsPsychFullscreen,
@@ -907,24 +937,47 @@ function buildTimeline(plan, assignment) {
 }
 
 function renderCompletion(message, failed = false) {
+  const downloadControls = !failed && exportBundle ? `
+    <div class="completion-downloads">
+      <button class="primary-button" id="download-json" type="button">下载完整 JSON</button>
+      <button class="secondary-button" id="download-csv" type="button">下载 CSV</button>
+    </div>
+    <p class="completion-filename"><strong>被试编号：</strong>${session.subject_code}</p>
+    <p class="completion-filename"><strong>文件名：</strong>${exportBundle.baseName}</p>
+    <p>请将两份文件通过招募平台或邮件发送给研究人员。在确认文件已经保存前，请不要关闭本页面。</p>` : "";
   jsPsychTarget.innerHTML = `
     <main class="completion-screen">
       <section>
-        <h1>${failed ? "数据尚未完全上传" : "实验完成"}</h1>
+        <h1>${failed ? "数据文件尚未生成" : "实验完成"}</h1>
         <p>${message}</p>
-        ${failed ? '<button class="primary-button" id="retry-upload" type="button">重新上传</button>' : ""}
+        ${downloadControls}
+        ${failed ? '<button class="primary-button" id="retry-export" type="button">重新生成数据</button>' : ""}
       </section>
     </main>`;
-  if (failed) document.querySelector("#retry-upload").addEventListener("click", completeExperiment);
+  if (failed) {
+    document.querySelector("#retry-export").addEventListener("click", completeExperiment);
+  } else if (exportBundle) {
+    document.querySelector("#download-json").addEventListener("click", () => downloadJson(exportBundle));
+    document.querySelector("#download-csv").addEventListener("click", () => downloadCsv(exportBundle));
+  }
 }
 
 async function completeExperiment() {
-  renderCompletion("正在确认数据，请不要关闭页面。");
+  renderCompletion("正在生成实验数据文件，请不要关闭页面。");
   try {
-    await finishSession(session.session_id);
-    renderCompletion("数据已完整保存。现在可以关闭此页面。感谢你的参与。");
-  } catch {
-    renderCompletion("网络暂时不可用，数据仍保存在本机浏览器中。请检查网络后点击“重新上传”。", true);
+    await finishSession(session.session_id).catch(error => {
+      console.warn("Server upload unavailable; exporting local data instead.", error);
+    });
+    exportBundle = createExportBundle(window.jsPsych, session);
+    window.__GITHUB_PAGES_EXPORT__ = exportBundle;
+    renderCompletion("数据已经整理完成。浏览器将尝试自动下载 JSON 和 CSV；若没有出现下载，请使用下面的按钮。");
+    setTimeout(() => {
+      downloadJson(exportBundle);
+      setTimeout(() => downloadCsv(exportBundle), 350);
+    }, 250);
+  } catch (error) {
+    console.error(error);
+    renderCompletion("数据整理暂未完成，请点击“重新生成数据”再次尝试。", true);
   }
 }
 
@@ -936,6 +989,7 @@ async function launchExperiment() {
     on_finish: completeExperiment,
     on_close: () => syncQueue()
   });
+  window.jsPsych = jsPsych;
   infoScreen.hidden = true;
   jsPsychTarget.hidden = false;
   const timeline = buildTimeline(plan, assignment);

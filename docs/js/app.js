@@ -521,8 +521,7 @@ function storeTrialData(data, spec, assignment) {
     screen_height: screen.height
   };
   Object.assign(data, record);
-  enqueueTrial(session.session_id, record);
-  if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  queueRecord(record);
 }
 
 function storeCalibrationData(data, assignment) {
@@ -558,8 +557,7 @@ function storeCalibrationData(data, assignment) {
     screen_height: screen.height
   };
   Object.assign(data, record);
-  enqueueTrial(session.session_id, record);
-  if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  queueRecord(record);
 }
 
 function reverseScore(value, maximum) {
@@ -568,6 +566,17 @@ function reverseScore(value, maximum) {
 
 function mean(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function queueRecord(record) {
+  try {
+    enqueueTrial(session.session_id, record);
+    if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  } catch (error) {
+    console.error("Data queue failed; timeline continues and upload will be checked at completion.", error);
+    window.__failedLocalRecords = window.__failedLocalRecords || [];
+    window.__failedLocalRecords.push(record);
+  }
 }
 
 function scoreQuestionnaire(questionnaireId, responses) {
@@ -644,8 +653,7 @@ function storeQuestionnaireData(data, assignment, context = {}) {
     screen_height: screen.height
   };
   Object.assign(data, record);
-  enqueueTrial(session.session_id, record);
-  if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
+  queueRecord(record);
 }
 
 function blockWorkloadTimeline(block, assignment, blockPosition, blockCount) {
@@ -957,7 +965,9 @@ function renderCompletion(message, failed = false) {
 async function completeExperiment() {
   renderCompletion("正在生成实验数据文件，请不要关闭页面。");
   try {
-    await finishSession(session.session_id);
+    await finishSession(session.session_id).catch(error => {
+      console.warn("Server upload unavailable; exporting local data instead.", error);
+    });
     exportBundle = createExportBundle(window.jsPsych, session);
     window.__GITHUB_PAGES_EXPORT__ = exportBundle;
     renderCompletion("数据已经整理完成。浏览器将尝试自动下载 JSON 和 CSV；若没有出现下载，请使用下面的按钮。");
@@ -965,7 +975,8 @@ async function completeExperiment() {
       downloadJson(exportBundle);
       setTimeout(() => downloadCsv(exportBundle), 350);
     }, 250);
-  } catch {
+  } catch (error) {
+    console.error(error);
     renderCompletion("数据整理暂未完成，请点击“重新生成数据”再次尝试。", true);
   }
 }
@@ -1051,7 +1062,7 @@ form.addEventListener("submit", async event => {
     } else if (error.message === "formal_subject_code_required") {
       formError.textContent = "正式实验请输入实验员提供的编号，例如 A001。";
     } else {
-      formError.textContent = "实验初始化失败，请刷新页面后重试。";
+      formError.textContent = "未能连接实验服务器，请检查网络后重试。";
     }
     startButton.disabled = false;
     startButton.textContent = "确认信息并开始";

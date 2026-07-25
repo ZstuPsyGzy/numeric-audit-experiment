@@ -411,7 +411,7 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .judgment-actions button { min-height: 68px; padding: 10px; border: 2px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); }
 .judgment-actions button:hover { border-color: var(--blue); background: #f8fbfd; }
 .judgment-actions strong, .judgment-actions span { display: block; }
-.judgment-actions strong { font-size: 17px; }
+.judgment-actions strong { color: var(--ink) !important; font-size: 17px; }
 .judgment-actions span { margin-top: 5px; color: #4a5259; font-size: 10px; font-weight: 700; }
 .response-message { min-height: 17px; margin: 5px 0 0; color: var(--red) !important; font-size: 10px; }
 .rating-section { display: grid; grid-template-columns: auto minmax(0, 1fr) 130px; gap: 18px; align-items: center; }
@@ -460,6 +460,8 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .completion-screen section { width: min(540px, 100%); padding: 42px; border: 1px solid var(--line); background: #fff; text-align: center; }
 .completion-screen h1 { margin: 0 0 14px; font-size: 28px; }
 .completion-screen p { margin: 0 0 20px; color: var(--muted); line-height: 1.7; }
+.completion-downloads { display: flex; justify-content: center; gap: 14px; margin: 26px 0 20px; flex-wrap: wrap; }
+.completion-filename { overflow-wrap: anywhere; color: #303846; }
 
 .calibration-panel { width: min(860px, 100%); }
 .calibration-heading { margin-bottom: 18px; }
@@ -503,16 +505,16 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .questionnaire-panel > header > span { color: var(--muted); font-size: 12px; }
 .questionnaire-description { padding: 12px 24px; border-bottom: 1px solid var(--line); background: #f8fafb; }
 .questionnaire-description p { margin: 0; color: #454d55; font-size: 12px; line-height: 1.65; }
-.questionnaire-scale-head { --option-count: 5; padding: 8px 24px; display: grid; grid-template-columns: minmax(360px, 1fr) repeat(var(--option-count), 68px); align-items: end; border-bottom: 1px solid var(--line); color: var(--muted); }
-.questionnaire-scale-label { padding: 0 2px; text-align: center; font-size: 9px; line-height: 1.25; }
+.questionnaire-scale-head { --option-count: 5; --option-width: 68px; padding: 8px 24px; display: grid; grid-template-columns: minmax(360px, 1fr) repeat(var(--option-count), var(--option-width)); align-items: end; border-bottom: 1px solid var(--line); color: var(--muted); }
+.questionnaire-scale-label { padding: 0 2px; text-align: center; font-size: 9px; font-weight: 700; line-height: 1.25; }
 .questionnaire-items { min-height: 0; overflow-y: auto; padding: 0 24px; }
 .questionnaire-item { display: grid; grid-template-columns: minmax(360px, 1fr) auto; align-items: center; min-height: 64px; border-bottom: 1px solid #e3e7ea; }
 .questionnaire-item > p { margin: 0; padding: 10px 16px 10px 0; color: #30373d; font-size: 12px; line-height: 1.55; }
 .questionnaire-item > p > span { width: 24px; height: 24px; margin-right: 9px; display: inline-grid; place-items: center; border-radius: 50%; background: #e8eef2; color: #344955; font-size: 10px; font-weight: 700; }
-.questionnaire-options { display: grid; grid-template-columns: repeat(var(--option-count), 68px); }
+.questionnaire-options { --option-count: 5; --option-width: 68px; display: grid; grid-template-columns: repeat(var(--option-count), var(--option-width)); }
 .questionnaire-options label { height: 54px; display: grid; place-items: center; cursor: pointer; }
 .questionnaire-options input { position: absolute; opacity: 0; pointer-events: none; }
-.questionnaire-options span { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #aeb8bf; border-radius: 50%; background: #fff; color: #47515a; font-size: 11px; font-weight: 700; }
+.questionnaire-options span { width: 36px; height: 34px; display: grid; place-items: center; border: 1px solid #aeb8bf; border-radius: 999px; background: #fff; color: #47515a; font-size: 11px; font-weight: 700; }
 .questionnaire-options label:hover span { border-color: var(--blue); }
 .questionnaire-options input:focus-visible + span { outline: 3px solid #9fc4dd; outline-offset: 2px; }
 .questionnaire-options input:checked + span { border-color: var(--blue); background: var(--blue); color: #fff; }

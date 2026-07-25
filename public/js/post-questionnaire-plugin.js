@@ -47,12 +47,13 @@ export class PostQuestionnairePlugin {
         : { text: label, value: index + 1 }
     ));
     const questions = trial.questions || [];
+    const optionWidth = labels.length >= 7 ? 52 : labels.length >= 6 ? 58 : 68;
     const scaleHeader = labels.map((label, index) => `
       <span class="questionnaire-scale-label" style="grid-column:${index + 2}">${escapeHtml(label.text)}</span>`).join("");
     const questionRows = questions.map((question, questionIndex) => `
       <div class="questionnaire-item" role="radiogroup" aria-labelledby="question-${questionIndex + 1}">
         <p id="question-${questionIndex + 1}"><span>${questionIndex + 1}</span>${escapeHtml(question.prompt)}</p>
-        <div class="questionnaire-options" style="--option-count:${labels.length}">
+        <div class="questionnaire-options" style="--option-count:${labels.length};--option-width:${optionWidth}px">
           ${labels.map(label => `
             <label title="${escapeHtml(label.text)}">
               <input type="radio" name="${escapeHtml(question.name)}" value="${escapeHtml(label.value)}" required>
@@ -72,7 +73,7 @@ export class PostQuestionnairePlugin {
             <span>${questions.length}题</span>
           </header>
           <div class="questionnaire-description">${trial.description}</div>
-          <div class="questionnaire-scale-head" style="--option-count:${labels.length}">
+          <div class="questionnaire-scale-head" style="--option-count:${labels.length};--option-width:${optionWidth}px">
             <i></i>${scaleHeader}
           </div>
           <div class="questionnaire-items">${questionRows}</div>
@@ -99,7 +100,9 @@ export class PostQuestionnairePlugin {
         firstMissing?.closest(".questionnaire-item")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
-      form.querySelector("button[type=submit]").disabled = true;
+      const submitButton = form.querySelector("button[type=submit]");
+      submitButton.disabled = true;
+      submitButton.textContent = "已提交，正在继续…";
       this.jsPsych.finishTrial({
         trial_kind: "questionnaire",
         questionnaire_id: trial.questionnaire_id,
