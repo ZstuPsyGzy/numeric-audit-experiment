@@ -229,6 +229,18 @@ function taskIntroductionContent() {
       <section><strong>什么是目标</strong><p>对某个核查位置，如果<strong class="key-emphasis">“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”</strong>，该位置就是目标。</p></section>
       <section><strong>怎样作答</strong><p><strong class="key-emphasis">先点击发现的全部目标</strong>，再判断整张矩阵<strong class="key-emphasis">“合规”或“不合规”</strong>。</p></section>
     </div>
+    <div class="critical-answer-guide" aria-label="关键作答规则">
+      <section>
+        <strong>作答方式</strong>
+        <p><b>1</b> 先<strong class="key-emphasis">点击发现的目标位置</strong>；如果发现多个目标，要<strong class="key-emphasis">点击全部目标</strong>。</p>
+        <p><b>2</b> 再点击下方<strong class="key-emphasis">合规 / 不合规</strong>按钮，完成整张矩阵判断。</p>
+      </section>
+      <section>
+        <strong>合规 / 不合规含义</strong>
+        <p><b class="key-emphasis">合规</b> = 没有发现目标，因此<strong class="key-emphasis">不点击任何位置</strong>。</p>
+        <p><b class="key-emphasis">不合规</b> = 发现一个或多个目标，因此需要<strong class="key-emphasis">先点击目标位置</strong>。</p>
+      </section>
+    </div>
     <div class="response-definition">
       <span><b class="key-emphasis">合规</b>：没有发现目标</span>
       <span><b class="key-emphasis">不合规</b>：发现一个或多个目标</span>
