@@ -218,6 +218,14 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .compact-steps li { font-size: 13.2px !important; }
 .compact-steps span { width: 24px !important; height: 24px !important; }
 .check-intro { max-width: 720px; margin: 0 auto; color: #464e55; font-size: 16.8px; line-height: 1.7; }
+.ai-role-layout { max-width: 920px; margin: 0 auto; }
+.ai-role-demo { display: grid; grid-template-columns: 300px minmax(360px, 1fr); gap: 28px; align-items: center; margin: 8px auto 22px; padding: 20px 22px; border: 1px solid var(--line); background: #fff; }
+.ai-role-demo .ai-cue-example { margin: 0 auto; }
+.ai-role-demo .mock-cue-status { min-height: 78px; justify-content: flex-start; font-size: 14.4px; }
+.ai-role-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.ai-role-cards div { padding: 17px 18px; border: 1px solid var(--line); background: #f8f9fa; }
+.ai-role-cards strong { display: block; margin-bottom: 8px; color: #22282e; font-size: 16.8px; }
+.ai-role-cards p { margin: 0; color: #4b535a; font-size: 14.4px; line-height: 1.65; }
 .ai-instruction-layout { display: grid; grid-template-columns: minmax(360px, .9fr) minmax(360px, 1fr); gap: 48px; align-items: center; max-width: 900px; margin: 0 auto; }
 .ai-cue-example { width: 260px; aspect-ratio: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 20px auto 0; }
 .ai-cue-example span { display: grid; place-items: center; border: 1px solid #d6dade; background: #fff; color: #111; font-size: 28.8px; font-weight: 650; }
@@ -228,6 +236,13 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .ai-boundary-note { margin-top: 16px; padding: 15px 17px; border-left: 4px solid #59636c; background: #f4f6f7; }
 .ai-boundary-note strong { font-size: 15.6px; }
 .ai-boundary-note p { margin: 6px 0 0; color: #4b535a; font-size: 14.4px; line-height: 1.7; }
+.ai-status-instruction { max-width: 900px; margin: 0 auto; }
+.ai-status-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.ai-status-examples section { padding: 20px; border: 1px solid var(--line); background: #fff; }
+.ai-status-examples section > strong { display: block; margin: 16px 0 7px; font-size: 18px; }
+.ai-status-examples p { margin: 0; color: #4b535a; font-size: 14.4px; line-height: 1.7; }
+.mock-cue-status { min-height: 64px; padding: 13px 16px; border: 1px solid #d9dde1; background: #f7f8f9; display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: center; color: #323940; font-size: 13.2px; }
+.mock-cue-status span { display: inline-flex; gap: 7px; align-items: center; white-space: nowrap; }
 .practice-guide { display: grid; gap: 30px; }
 .practice-guide > section + section { padding-top: 28px; border-top: 1px solid var(--line); }
 .practice-guide > section > h2 { margin: 0 0 18px; font-size: 21.6px; }
@@ -582,7 +597,7 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
   #participant-form { border-right: 0; border-bottom: 1px solid var(--line); }
   .instruction-columns { grid-template-columns: 1fr; }
   .instruction-columns section + section { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--line); }
-  .task-definition-grid, .critical-answer-guide, .rule-visual-layout, .ai-instruction-layout, .audit-area-layout { grid-template-columns: 1fr; }
+  .task-definition-grid, .critical-answer-guide, .rule-visual-layout, .ai-instruction-layout, .audit-area-layout, .ai-role-demo, .ai-role-cards { grid-template-columns: 1fr; }
   .task-intro-layout { grid-template-columns: 1fr; }
   .task-intro-layout section { min-height: 0; }
   .task-definition-grid section { min-height: 0; }

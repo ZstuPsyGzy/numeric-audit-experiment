@@ -52,10 +52,10 @@ const AI_LITERACY_ITEMS = [
 const NASA_TLX_ITEMS = [
   { name: "tlx_mental", prompt: "心理需求：刚才这一组任务需要多少思考、注意和记忆投入？" },
   { name: "tlx_physical", prompt: "身体需求：刚才这一组任务需要多少身体操作或身体负担？" },
-  { name: "tlx_temporal", prompt: "时间需求：刚才这一组任务让你感到多大的时间压力？" },
-  { name: "tlx_performance", prompt: "表现感受：你对自己刚才这一组任务的表现有多不满意？" },
-  { name: "tlx_effort", prompt: "努力程度：你为了完成刚才这一组任务投入了多少努力？" },
-  { name: "tlx_frustration", prompt: "挫败感：刚才这一组任务让你感到多大程度的烦躁、压力或受挫？" }
+  { name: "tlx_temporal", prompt: "时间需求：刚才这一组任务让您感到多大的时间压力？" },
+  { name: "tlx_performance", prompt: "表现感受：您对自己刚才这一组任务的表现有多不满意？" },
+  { name: "tlx_effort", prompt: "努力程度：您为了完成刚才这一组任务投入了多少努力？" },
+  { name: "tlx_frustration", prompt: "挫败感：刚才这一组任务让您感到多大程度的烦躁、压力或受挫？" }
 ];
 const AI_USEFULNESS_ITEM = {
   name: "ai_usefulness",
@@ -253,7 +253,7 @@ function neighborCheckExample() {
 function auditAreaInstructionContent() {
   return `<div class="audit-area-layout">
     <section class="audit-area-copy">
-      <p class="instruction-lead">不同 trial 中，矩阵规模可能不同；这只表示<strong class="key-emphasis">需要核查的位置数量不同</strong>，判断规则始终不变。</p>
+      <p class="instruction-lead">不同任务中，矩阵规模可能不同；这只表示<strong class="key-emphasis">需要核查的位置数量不同</strong>，判断规则始终不变。</p>
       <div class="audit-rule-cards">
         <section><strong>只核查中间底纹区域</strong><p>带淡灰底纹的位置是<strong class="key-emphasis">需要审核、可以点击</strong>的位置。最外圈数字只是关系计算时的参考数字。</p></section>
         <section><strong>每次只看一个位置</strong><p>判断某个位置时，只比较这个位置的<strong class="key-emphasis">上、下、左、右</strong>四个相邻数字。</p></section>
@@ -276,7 +276,7 @@ function auditAreaInstructionContent() {
 
 function taskIntroductionContent() {
   return `<div class="instruction-prose">
-    <p class="instruction-lead">你将看到一个数字矩阵。本任务只需要完成两件事：<strong class="key-emphasis">找出目标</strong>，然后<strong class="key-emphasis">判断整张矩阵是否合规</strong>。</p>
+    <p class="instruction-lead">您将看到一个数字矩阵。本任务只需要完成两件事：<strong class="key-emphasis">找出目标</strong>，然后<strong class="key-emphasis">判断整张矩阵是否合规</strong>。</p>
     <div class="task-intro-layout">
       <section>
         <h2>一、找什么</h2>
@@ -307,13 +307,13 @@ function taskIntroductionContent() {
 
 function experimentFlowContent() {
   return `<div class="experiment-flow-overview">
-    <p class="instruction-lead">整个实验将按照以下顺序进行，预计需要约 60–75 分钟。区组之间可以短暂休息。</p>
+    <p class="instruction-lead">整个实验将按照以下顺序进行，预计需要约 60–75 分钟。每组任务之间可以短暂休息。</p>
     <ol class="experiment-flow-grid">
       <li><span class="flow-index">1</span><div><strong>学习任务规则</strong><p>阅读数字矩阵、核查区域和目标判断规则，并完成一道理解检查。</p></div></li>
       <li><span class="flow-index">2</span><div><strong>显示与尺寸校准</strong><p>进入全屏，完成简单的颜色辨认和实体卡片尺寸校准。</p></div></li>
       <li><span class="flow-index">3</span><div><strong>独立审核阶段</strong><p>先完成无 AI 练习，再<strong class="key-emphasis">独立完成数字矩阵核查任务</strong>。</p></div></li>
       <li><span class="flow-index">4</span><div><strong>AI 辅助审核阶段</strong><p>阅读 AI 候选提示说明，完成 AI 练习和<strong class="key-emphasis">AI 辅助核查任务</strong>。</p></div></li>
-      <li><span class="flow-index">5</span><div><strong>阶段评价</strong><p>在实验区组结束后，报告本阶段的任务负荷及辅助系统使用感受。</p></div></li>
+      <li><span class="flow-index">5</span><div><strong>阶段评价</strong><p>在每组任务结束后，报告本阶段的任务负荷及辅助系统使用感受。</p></div></li>
       <li><span class="flow-index">6</span><div><strong>实验后问卷</strong><p>完成简短问卷，最后生成并保存匿名实验数据文件。</p></div></li>
     </ol>
     <div class="ai-boundary-note"><strong>请按页面顺序完成</strong><p>实验过程中请<strong class="key-emphasis">保持全屏</strong>并<strong class="key-emphasis">独立作答</strong>。每个阶段开始前，程序都会再次显示相应说明。</p></div>
@@ -342,20 +342,39 @@ function taskRuleVisualContent() {
 }
 
 function aiRoleInstructionContent() {
-  return `<div class="ai-instruction-layout">
-    <section>
-      <p class="instruction-lead">本阶段将提供一个由过往数字核查数据训练的 <strong class="key-emphasis">AI 模型</strong>辅助你完成任务。</p>
-      <div class="ai-cue-example" aria-label="AI 分析数字矩阵并生成候选位置的示意">
-        <span>6</span><span>8</span><span>7</span>
-        <span>5</span><span class="deep-candidate">4</span><span>6</span>
+  return `<div class="ai-role-layout">
+    <p class="instruction-lead">本阶段将提供一个由过往数字核查数据训练的 <strong class="key-emphasis">AI 模型</strong>辅助您完成任务。AI 会在矩阵中标出它认为<strong class="key-emphasis">值得优先核查</strong>的位置。</p>
+    <section class="ai-role-demo">
+      <div class="ai-cue-example" aria-label="AI 分析数字矩阵并同时生成深红和浅红候选位置的示意">
+        <span>6</span><span class="deep-candidate">8</span><span>7</span>
+        <span>5</span><span>4</span><span class="light-candidate">6</span>
         <span>9</span><span>3</span><span>8</span>
       </div>
+      <div class="mock-cue-status"><span class="analysis-done">AI 分析已完成：已生成候选提示</span><span><i class="cue-key deep"></i>深红候选</span><span><i class="cue-key light"></i>浅红候选</span></div>
     </section>
-    <section class="ai-explanation-list">
-      <div class="cue-explanation"><p><strong>AI 提供候选位置</strong><br>模型会分析数字矩阵，并标出它认为<strong class="key-emphasis">值得优先核查</strong>的位置。</p></div>
-      <div class="cue-explanation"><p><strong>AI 不直接给出答案</strong><br>候选提示不代表该位置一定是目标，也不直接判断整张矩阵是否<strong class="key-emphasis">合规</strong>。</p></div>
-      <div class="ai-boundary-note"><strong>最终判断由你完成</strong><p>请根据上下左右关系规则核查候选位置及其他位置，再完成<strong class="key-emphasis">最终判断</strong>。</p></div>
+    <section class="ai-role-cards">
+      <div><strong>AI 做什么</strong><p>分析当前矩阵，并给出建议优先核查的位置。</p></div>
+      <div><strong>AI 不做什么</strong><p>不直接告诉您整张矩阵合规或不合规。</p></div>
+      <div><strong>您需要做什么</strong><p>根据上下左右关系规则核查，并完成最终判断。</p></div>
     </section>
+  </div>`;
+}
+
+function aiStatusInstructionContent() {
+  return `<div class="ai-status-instruction">
+    <p class="instruction-lead">AI 阶段的每个任务下方都会显示<strong class="key-emphasis">AI 分析状态</strong>，用于告诉您本次 AI 是否生成了候选提示。</p>
+    <div class="ai-status-examples">
+      <section>
+        <div class="mock-cue-status"><span class="analysis-done">AI 分析已完成：已生成候选提示</span><span><i class="cue-key deep"></i>深红候选</span><span><i class="cue-key light"></i>浅红候选</span></div>
+        <strong>有候选提示</strong>
+        <p>说明 AI 标出了一个或两个建议优先核查的位置。请先核查这些位置，再根据需要继续检查其他位置。</p>
+      </section>
+      <section>
+        <div class="mock-cue-status"><span class="analysis-done">AI 分析已完成：本次未生成候选提示</span></div>
+        <strong>没有候选提示</strong>
+        <p>说明 AI 本次没有标出可疑位置。它不是最终答案，您仍需根据规则完成自己的核查和判断。</p>
+      </section>
+    </div>
   </div>`;
 }
 
@@ -370,9 +389,9 @@ function aiInstructionContent() {
       </div>
     </section>
     <section class="ai-explanation-list">
-      <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>较深的淡红底纹</strong><br>模型认为<strong class="key-emphasis">最值得优先核查</strong>的位置。</p></div>
-      <div class="cue-explanation"><i class="cue-key light"></i><p><strong>较浅的淡红底纹</strong><br>模型认为<strong class="key-emphasis">也值得核查</strong>的位置。</p></div>
-      <div class="ai-boundary-note"><strong>请注意</strong><p>深红和浅红候选<strong class="key-emphasis">不会指向同一个位置</strong>。AI 只帮助安排核查顺序，不直接给出最终答案；候选可能正确，也可能把正常位置标出来，最终判断仍由你完成。</p></div>
+      <div class="cue-explanation"><i class="cue-key deep"></i><p><strong>深红候选</strong><br>AI 认为<strong class="key-emphasis">最值得优先核查</strong>的位置。</p></div>
+      <div class="cue-explanation"><i class="cue-key light"></i><p><strong>浅红候选</strong><br>AI 认为<strong class="key-emphasis">也值得核查</strong>的位置。</p></div>
+      <div class="ai-boundary-note"><strong>请注意</strong><p>深红和浅红候选<strong class="key-emphasis">不会指向同一个位置</strong>。候选可能正确，也可能标在正常位置上；最终判断仍由您完成。</p></div>
     </section>
   </div>`;
 }
@@ -380,10 +399,11 @@ function aiInstructionContent() {
 function instructionContent(phase, reliabilitySpec = null) {
   const aiSections = phase === "ai" ? `
     <section><h2>AI 的作用</h2>${aiRoleInstructionContent()}</section>
+    <section><h2>AI 分析状态</h2>${aiStatusInstructionContent()}</section>
     <section><h2>AI 候选颜色</h2>${aiInstructionContent()}</section>
     ${reliabilitySpec ? `
       <section><h2>本阶段 AI 的历史正确率</h2>${aiReliabilityInstructionContent(reliabilitySpec)}</section>
-      <section><h2>如何理解两类信息</h2>${aiCalibrationInstructionContent(reliabilitySpec)}</section>
+      <section><h2>怎样使用 AI 提示</h2>${aiCalibrationInstructionContent(reliabilitySpec)}</section>
     ` : ""}` : "";
   return `<div class="practice-guide">
     <section><h2>任务说明</h2>${taskIntroductionContent()}</section>
@@ -406,12 +426,12 @@ function phaseIntro(phase) {
   if (phase === "baseline") {
     return {
       title: "独立审核阶段",
-    content: `<div class="phase-intro"><p>本阶段<strong class="key-emphasis">不显示任何 AI 候选</strong>，用于测量你尚未接触 AI 提示时的独立审核表现。</p><p>实验首先进行一次任务规则练习，共 5 个 trial。练习正确率达到 <strong class="key-emphasis">80%</strong> 后进入无 AI 正式基线；后续无 AI block 不再重复练习。</p></div>`
+    content: `<div class="phase-intro"><p>本阶段<strong class="key-emphasis">不显示任何 AI 候选</strong>，用于测量您尚未接触 AI 提示时的独立审核表现。</p><p>实验首先进行一次任务规则练习，共 5 个练习任务。练习正确率达到 <strong class="key-emphasis">80%</strong> 后进入无 AI 正式基线；后续无 AI 任务组不再重复练习。</p></div>`
     };
   }
   return {
     title: "AI 辅助审核阶段",
-    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示<strong class="key-emphasis">深红和/或浅红候选</strong>；候选只是 AI 建议优先检查的位置，最终判断仍由你完成。</p><p>根据实验安排，每位参与者只使用一种 <strong class="key-emphasis">AI 配置</strong>。接下来将依次说明 AI 的作用、候选颜色和历史表现，随后进行一次 5-trial AI 熟悉练习。</p></div>`
+    content: `<div class="phase-intro"><p>无 AI 正式基线已经完成。本阶段会显示<strong class="key-emphasis">深红和/或浅红候选</strong>；候选只是 AI 建议优先检查的位置，最终判断仍由您完成。</p><p>根据实验安排，每位参与者只使用一种 <strong class="key-emphasis">AI 配置</strong>。接下来将依次说明 AI 的作用、候选颜色和历史表现，随后进行一次 5 个 AI 熟悉练习任务。</p></div>`
   };
 }
 
@@ -428,7 +448,7 @@ function reliabilityUnits(value, colorClass) {
 
 function aiReliabilityInstructionContent(spec) {
   return `<div class="reliability-instruction">
-    <p class="instruction-lead">以下<strong class="key-emphasis">历史正确率</strong>适用于你接下来整个 AI 阶段，并在所有矩阵规模中保持不变。</p>
+    <p class="instruction-lead">以下<strong class="key-emphasis">历史正确率</strong>适用于您接下来整个 AI 阶段，并在所有矩阵规模中保持不变。</p>
     <div class="reliability-definition">
       <section><strong>历史正确率如何计算</strong><p>当某种颜色候选出现时，如果它所在的位置确实是<strong class="key-emphasis">目标</strong>，就记为一次正确；如果它标在<strong class="key-emphasis">正常位置</strong>上，就记为一次错误。</p></section>
       <section><strong>如何理解百分比</strong><p><strong class="key-emphasis">90%</strong> 表示过去每 10 个同类候选中平均约有 9 个是真实目标；<strong class="key-emphasis">70%</strong> 表示平均约有 7 个是真实目标。</p></section>
@@ -453,12 +473,12 @@ function aiReliabilityInstructionContent(spec) {
 
 function aiCalibrationInstructionContent(spec) {
   return `<div class="reliability-instruction">
-    <p class="instruction-lead"><strong class="key-emphasis">颜色深浅</strong>和<strong class="key-emphasis">历史正确率</strong>来自两个不同环节，请结合两类信息理解 AI 提示。</p>
+    <p class="instruction-lead">AI 提示包含两类信息：<strong class="key-emphasis">颜色深浅</strong>表示本次建议优先核查的位置；<strong class="key-emphasis">历史正确率</strong>表示同类候选在过去任务中落在真实目标位置的比例。</p>
     <div class="reliability-definition">
-      <section><strong>颜色深浅：模型当前的判断</strong><p>深红表示模型认为<strong class="key-emphasis">更值得优先核查</strong>，浅红表示模型认为<strong class="key-emphasis">也值得核查</strong>。这是模型分析当前矩阵后给出的候选优先级。</p></section>
-      <section><strong>历史正确率：过去的实际表现</strong><p>研究人员使用标准答案核验后发现，深红候选过去约有 <strong class="key-emphasis">${Math.round(spec.deep_validity * 100)}%</strong> 位于真实目标位置，浅红候选过去约有 <strong class="key-emphasis">${Math.round(spec.light_validity * 100)}%</strong> 位于真实目标位置。</p></section>
+      <section><strong>颜色深浅：本次候选优先级</strong><p>深红表示 AI 认为这个位置<strong class="key-emphasis">最值得优先核查</strong>；浅红表示 AI 认为这个位置<strong class="key-emphasis">也值得核查</strong>。</p></section>
+      <section><strong>历史正确率：同类候选过去的表现</strong><p>深红候选过去约有 <strong class="key-emphasis">${Math.round(spec.deep_validity * 100)}%</strong> 位于真实目标位置；浅红候选过去约有 <strong class="key-emphasis">${Math.round(spec.light_validity * 100)}%</strong> 位于真实目标位置。</p></section>
     </div>
-    <div class="ai-boundary-note"><strong>两者不一定一致</strong><p>颜色是 AI 自己对当前候选的判断，百分比是该类候选过去实际有多准确。因此，<strong class="key-emphasis">颜色较深不一定代表它过去的实际正确率更高</strong>。请结合候选提示、历史表现和你自己的核查结果作答。</p></div>
+    <div class="ai-boundary-note"><strong>仍需自行判断</strong><p>AI 候选可以帮助您安排核查顺序，但不能替代您的判断。请根据<strong class="key-emphasis">上下左右关系规则</strong>完成点击和合规/不合规判断。</p></div>
   </div>`;
 }
 
@@ -466,13 +486,13 @@ function blockIntro(spec, trialCount) {
   if (!spec.ai_present) {
     return {
       title: "无 AI · 独立审核",
-      content: `<div class="block-intro"><p>本组共 ${trialCount} 个 trial，<strong class="key-emphasis">不显示 AI 候选</strong>。</p><p>请保持准确，在确认后再提交判断。</p></div>`
+      content: `<div class="block-intro"><p>本组共 ${trialCount} 个任务，<strong class="key-emphasis">不显示 AI 候选</strong>。</p><p>请保持准确，在确认后再提交判断。</p></div>`
     };
   }
   return {
     title: AI_CONDITIONS[spec.condition_key].label,
     content: `<div class="block-intro">
-      <p>本组共 ${trialCount} 个 trial。以下百分比表示：该颜色候选出现时，它<strong class="key-emphasis">落在真实目标位置上的历史比例</strong>。</p>
+      <p>本组共 ${trialCount} 个任务。以下百分比表示：该颜色候选出现时，它<strong class="key-emphasis">落在真实目标位置上的历史比例</strong>。</p>
       <div class="validity-bars">
         ${validityBar("深红候选有效率", spec.deep_validity, "deep-fill")}
         ${validityBar("浅红候选有效率", spec.light_validity, "light-fill")}
@@ -729,11 +749,11 @@ function blockWorkloadTimeline(block, assignment, blockPosition, blockCount) {
   return {
     type: PostQuestionnairePlugin,
     title: spec.ai_present ? "本组任务评价" : "本组任务负荷评价",
-    description: `<p>请根据刚刚完成的这一组 trial 作答。0 表示很低，100 表示很高。</p>${spec.ai_present ? "<p>最后一题只评价刚才这一组 AI 分析结果对你的帮助程度。</p>" : ""}`,
+    description: `<p>请根据刚刚完成的这一组任务作答。0 表示很低，100 表示很高。</p>${spec.ai_present ? "<p>最后一题只评价刚才这一组 AI 分析结果对您的帮助程度。</p>" : ""}`,
     questionnaire_id: "block_nasa_tlx",
     scale_name: "Raw NASA-TLX + AI usefulness",
     scale_version: "Hart & Staveland 1988; raw six-dimension block rating",
-    progress_label: `区组评价 ${blockPosition + 1} / ${blockCount}`,
+    progress_label: `本组评价 ${blockPosition + 1} / ${blockCount}`,
     questions,
     labels,
     button_label: "提交评价，继续",
@@ -757,7 +777,7 @@ function postQuestionnaireTimeline(assignment) {
     {
       type: PostQuestionnairePlugin,
       title: "简版大五人格问卷",
-      description: "<p>下面这些陈述在多大程度上符合你通常的情况？请根据真实感受作答，没有正确或错误答案。</p>",
+      description: "<p>下面这些陈述在多大程度上符合您通常的情况？请根据真实感受作答，没有正确或错误答案。</p>",
       questionnaire_id: "bfi10_zh",
       scale_name: "Chinese BFI-10",
       scale_version: "Carciofo et al. 2016; Rammstedt & John 2007",
@@ -769,7 +789,7 @@ function postQuestionnaireTimeline(assignment) {
     {
       type: PostQuestionnairePlugin,
       title: "人工智能素养问卷",
-      description: "<p>请判断以下陈述在多大程度上符合你的实际情况。这里的人工智能包括日常使用的智能应用、产品或助手。</p>",
+      description: "<p>请判断以下陈述在多大程度上符合您的实际情况。这里的人工智能包括日常使用的智能应用、产品或助手。</p>",
       questionnaire_id: "ai_literacy_wang12_zh",
       scale_name: "Artificial Intelligence Literacy Scale",
       scale_version: "Wang, Rau, & Yuan 2022; 12-item Chinese presentation",
@@ -892,41 +912,49 @@ function buildTimeline(plan, assignment) {
       ...intro,
       button_label: phase === "ai"
         ? "下一步：了解 AI"
-        : skipPractice ? "进入预测试区组" : "开始练习"
+        : skipPractice ? "进入预测试任务" : "开始练习"
     });
     if (phase === "ai") {
       const aiSpec = phaseTrials[0];
       const phasePage = { title: intro.title, content: intro.content };
       const aiRolePage = { title: "AI 如何辅助核查", content: aiRoleInstructionContent() };
+      const aiStatusPage = { title: "AI 分析状态说明", content: aiStatusInstructionContent() };
       const aiColorPage = { title: "AI 候选颜色说明", content: aiInstructionContent() };
       const aiReliabilityPage = { title: "本阶段 AI 的历史正确率", content: aiReliabilityInstructionContent(aiSpec) };
       timeline.push({
         type: ExperimentScreenPlugin,
         ...aiRolePage,
         back_pages: [phasePage],
+        button_label: "下一步：了解 AI 分析状态",
+        screen_class: "instruction-screen"
+      });
+      timeline.push({
+        type: ExperimentScreenPlugin,
+        ...aiStatusPage,
+        back_pages: [phasePage, aiRolePage],
         button_label: "下一步：了解候选颜色",
         screen_class: "instruction-screen"
       });
       timeline.push({
         type: ExperimentScreenPlugin,
         ...aiColorPage,
-        back_pages: [phasePage, aiRolePage],
+        back_pages: [phasePage, aiRolePage, aiStatusPage],
         button_label: "下一步：查看历史正确率",
         screen_class: "instruction-screen"
       });
       timeline.push({
         type: ExperimentScreenPlugin,
         ...aiReliabilityPage,
-        back_pages: [phasePage, aiRolePage, aiColorPage],
-        button_label: "下一步：理解两类信息",
+        back_pages: [phasePage, aiRolePage, aiStatusPage, aiColorPage],
+        button_label: "下一步：怎样使用 AI 提示",
         screen_class: "instruction-screen reliability-screen"
       });
       timeline.push({
         type: ExperimentScreenPlugin,
-        title: "如何理解颜色与历史正确率",
+        title: "怎样使用 AI 提示",
         content: aiCalibrationInstructionContent(aiSpec),
-        back_pages: [phasePage, aiRolePage, aiColorPage, aiReliabilityPage],
-        button_label: skipPractice ? "进入预测试区组" : "开始 AI 练习",
+        back_pages: [phasePage, aiRolePage, aiStatusPage, aiColorPage, aiReliabilityPage],
+        button_label: skipPractice ? "进入预测试任务" : "开始 AI 练习",
         screen_class: "instruction-screen reliability-screen"
       });
     }
@@ -935,7 +963,7 @@ function buildTimeline(plan, assignment) {
       timeline.push({
         type: ExperimentScreenPlugin,
         title: "练习通过",
-        content: "<div class=\"phase-intro\"><p>练习完全正确率已达到 80%。下一页将显示正式区组条件，正式 trial 不提供正确答案反馈。</p></div>",
+        content: "<div class=\"phase-intro\"><p>练习完全正确率已达到 80%。下一页将进入正式任务，正式任务不提供正确答案反馈。</p></div>",
         button_label: "进入正式实验"
       });
     }
@@ -960,7 +988,7 @@ function buildTimeline(plan, assignment) {
         timeline.push({
           type: ExperimentScreenPlugin,
           title: "当前 AI 条件完成",
-          content: "<div class=\"phase-intro\"><p>已完成当前 AI 条件下三个 set size、共 60 个正式 trial。请休息片刻，准备好后进入下一个 AI 条件。</p></div>",
+          content: "<div class=\"phase-intro\"><p>已完成当前 AI 条件下三种矩阵规模、共 60 个正式任务。请休息片刻，准备好后进入下一个 AI 条件。</p></div>",
           button_label: "休息结束，继续"
         });
       }
@@ -1153,7 +1181,7 @@ consentContinue.addEventListener("click", () => {
 });
 consentDecline.addEventListener("click", () => {
   consentScreen.className = "consent-exit";
-  consentScreen.innerHTML = `<section><h1>你已选择不参加实验</h1><p>程序不会收集或上传你的任何实验信息。现在可以安全关闭本页面。</p></section>`;
+  consentScreen.innerHTML = `<section><h1>您已选择不参加实验</h1><p>程序不会收集或上传您的任何实验信息。现在可以安全关闭本页面。</p></section>`;
 });
 installFullscreenGuard();
 runPreflight();
