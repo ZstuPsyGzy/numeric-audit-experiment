@@ -19,7 +19,7 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "local-development-only";
 const SUBJECT_CODE_SALT = process.env.SUBJECT_CODE_SALT || "local-development-salt";
 const PUBLIC_ORIGIN = process.env.PUBLIC_ORIGIN || "";
 const MAX_BODY_BYTES = 1024 * 1024;
-const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.28";
+const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.40";
 
 mkdirSync(DATA_DIR, { recursive: true });
 const db = new DatabaseSync(join(DATA_DIR, "experiment.sqlite3"));
@@ -274,9 +274,11 @@ async function handleApi(req, res, url) {
     jsonResponse(res, 201, {
       ok: true,
       session_id: sessionId,
+      subject_code: code,
       experiment_version: EXPERIMENT_VERSION,
       mode,
-      assignment
+      assignment,
+      client_meta: body.client_meta || {}
     });
     return;
   }
@@ -365,7 +367,7 @@ function serveStatic(req, res, url) {
       : "no-store",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "same-origin",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
   });
   if (req.method === "HEAD") res.end();
   else res.end(body);

@@ -4143,4 +4143,3 @@ var jsPsychModule = (function (exports) {
 
 })({});
 var initJsPsych = jsPsychModule.initJsPsych;
-//# sourceMappingURL=https://unpkg.com/jspsych@8.2.3/dist/index.browser.js.map

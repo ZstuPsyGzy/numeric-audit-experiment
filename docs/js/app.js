@@ -99,17 +99,63 @@ function detectMobile() {
   return userAgentMobile || uaDataMobile;
 }
 
+function collectDisplayMetrics() {
+  const viewportWidth = Math.round(window.visualViewport?.width || innerWidth || 0);
+  const viewportHeight = Math.round(window.visualViewport?.height || innerHeight || 0);
+  const screenWidth = Math.round(screen.width || 0);
+  const screenHeight = Math.round(screen.height || 0);
+  const availWidth = Math.round(screen.availWidth || 0);
+  const availHeight = Math.round(screen.availHeight || 0);
+  const outerWidthValue = Math.round(outerWidth || 0);
+  const outerHeightValue = Math.round(outerHeight || 0);
+  const dpr = Number((window.devicePixelRatio || 1).toFixed(2));
+  const candidates = [
+    [screenWidth, screenHeight],
+    [availWidth, availHeight],
+    [outerWidthValue, outerHeightValue],
+    [viewportWidth, viewportHeight]
+  ].filter(([width, height]) => width > 0 && height > 0);
+  const best = candidates.reduce((bestPair, pair) => {
+    const [width, height] = pair;
+    const [bestWidth, bestHeight] = bestPair;
+    return width * height > bestWidth * bestHeight ? pair : bestPair;
+  }, [0, 0]);
+  const longSide = Math.max(best[0], best[1]);
+  const shortSide = Math.min(best[0], best[1]);
+  return {
+    viewportWidth,
+    viewportHeight,
+    screenWidth,
+    screenHeight,
+    availWidth,
+    availHeight,
+    outerWidth: outerWidthValue,
+    outerHeight: outerHeightValue,
+    dpr,
+    bestWidth: best[0],
+    bestHeight: best[1],
+    longSide,
+    shortSide
+  };
+}
+
 function runPreflight() {
+  const displayMetrics = collectDisplayMetrics();
+  const isMobile = detectMobile();
+  const hasDesktopPointer = matchMedia("(pointer: fine)").matches || matchMedia("(hover: hover)").matches;
+  const displayPass = displayMetrics.longSide >= 1280 && displayMetrics.shortSide >= 800;
   const checks = [
     {
       label: "电脑设备",
-      pass: !detectMobile() && matchMedia("(pointer: fine)").matches,
-      detail: "实验仅支持带鼠标或触控板的电脑"
+      pass: !isMobile,
+      detail: hasDesktopPointer
+        ? "已检测到电脑环境和鼠标/触控板指针"
+        : "未检测到手机/平板；如果使用触控板但系统未识别，仍可继续测试"
     },
     {
       label: "屏幕尺寸",
-      pass: screen.width >= 1280 && screen.height >= 800,
-      detail: `检测到 ${screen.width}×${screen.height}，最低要求 1280×800`
+      pass: displayPass,
+      detail: `检测到 screen ${displayMetrics.screenWidth}×${displayMetrics.screenHeight}，viewport ${displayMetrics.viewportWidth}×${displayMetrics.viewportHeight}，DPR ${displayMetrics.dpr}；正式实验建议全屏后至少 1280×800`
     },
     {
       label: "全屏功能",
@@ -128,9 +174,16 @@ function runPreflight() {
     item.innerHTML = `<span aria-hidden="true">${check.pass ? "通过" : "未通过"}</span><div><strong>${check.label}</strong><small>${check.detail}</small></div>`;
     return item;
   }));
-  const allPassed = checks.every(check => check.pass) && planValidation.valid;
+  const hardPassed = checks.every(check => check.pass) && planValidation.valid;
+  const allPassed = mode === "pilot" ? planValidation.valid : hardPassed;
   startButton.disabled = !allPassed;
-  if (!allPassed) formError.textContent = "当前设备不满足实验要求，请更换电脑或调整显示设备后刷新页面。";
+  if (!hardPassed && mode === "pilot") {
+    formError.textContent = "快速测试模式已允许继续；正式实验仍会要求电脑设备、全屏功能和足够屏幕尺寸。";
+  } else if (!hardPassed) {
+    formError.textContent = "当前设备不满足正式实验要求，请更换电脑、关闭移动模拟、调整浏览器缩放或使用更大显示设备后刷新页面。";
+  } else {
+    formError.textContent = "";
+  }
   return { allPassed, checks };
 }
 
@@ -223,22 +276,25 @@ function auditAreaInstructionContent() {
 
 function taskIntroductionContent() {
   return `<div class="instruction-prose">
-    <p class="instruction-lead">你将看到一个数字矩阵。任务是核查矩阵内部的每一个有效位置，找出是否存在<strong class="key-emphasis">不满足上下左右关系规则的目标</strong>。</p>
-    <div class="task-definition-grid">
-      <section><strong>需要核查什么</strong><p>矩阵内部带有淡灰底纹的可点击位置构成<strong class="key-emphasis">核查区域</strong>。最外圈数字只提供上下左右关系所需的参考，不需要点击。不同 trial 的矩阵大小可能不同，但核查规则保持不变。</p></section>
-      <section><strong>什么是目标</strong><p>对某个核查位置，如果<strong class="key-emphasis">“上方数字 + 下方数字”不等于“左侧数字 + 右侧数字”</strong>，该位置就是目标。</p></section>
-      <section><strong>怎样作答</strong><p><strong class="key-emphasis">先点击发现的全部目标</strong>，再判断整张矩阵<strong class="key-emphasis">“合规”或“不合规”</strong>。</p></section>
-    </div>
-    <div class="critical-answer-guide" aria-label="关键作答规则">
+    <p class="instruction-lead">你将看到一个数字矩阵。本任务只需要完成两件事：<strong class="key-emphasis">找出目标</strong>，然后<strong class="key-emphasis">判断整张矩阵是否合规</strong>。</p>
+    <div class="task-intro-layout">
       <section>
-        <strong>作答方式</strong>
-        <p><b>1</b> 先<strong class="key-emphasis">点击发现的目标位置</strong>；如果发现多个目标，要<strong class="key-emphasis">点击全部目标</strong>。</p>
-        <p><b>2</b> 再点击下方<strong class="key-emphasis">合规 / 不合规</strong>按钮，完成整张矩阵判断。</p>
+        <h2>一、找什么</h2>
+        <p>只核查矩阵内部带有淡灰底纹的可点击位置。最外圈数字只用于提供上下左右参考，不需要点击。</p>
+        <div class="target-rule-box" aria-label="目标判定规则">
+          <span>上方数字 + 下方数字</span>
+          <b>不等于</b>
+          <span>左侧数字 + 右侧数字</span>
+        </div>
+        <p>如果上面的关系成立，该位置就是<strong class="key-emphasis">目标</strong>。</p>
       </section>
       <section>
-        <strong>合规 / 不合规含义</strong>
-        <p><b class="key-emphasis">合规</b> = 没有发现目标，因此<strong class="key-emphasis">不点击任何位置</strong>。</p>
-        <p><b class="key-emphasis">不合规</b> = 发现一个或多个目标，因此需要<strong class="key-emphasis">先点击目标位置</strong>。</p>
+        <h2>二、怎么反应</h2>
+        <ol class="task-response-steps">
+          <li><span>1</span><p>如果发现目标，先点击目标位置；如果发现多个目标，要点击全部目标。</p></li>
+          <li><span>2</span><p>点击完目标后，再判断整张矩阵是<strong class="key-emphasis">“合规”</strong>还是<strong class="key-emphasis">“不合规”</strong>。</p></li>
+          <li><span>3</span><p>如果没有发现目标，不点击任何位置，直接选择<strong class="key-emphasis">“合规”</strong>。</p></li>
+        </ol>
       </section>
     </div>
     <div class="response-definition">
@@ -448,9 +504,9 @@ function selectPracticeSpecs(phase, formalPlan) {
     : [
       correctAiPool.find(trial => trial.system_event === "correct_rejection"),
       correctAiPool.filter(trial => trial.system_event === "correct_rejection")[1],
-      correctAiPool.find(trial => trial.system_event === "hit" && trial.target_count === 1),
-      correctAiPool.filter(trial => trial.system_event === "hit" && trial.target_count === 1)[1],
-      correctAiPool.find(trial => trial.system_event === "hit" && trial.target_count === 2)
+      correctAiPool.find(trial => trial.system_event === "hit" && trial.target_count === 2),
+      correctAiPool.filter(trial => trial.system_event === "hit" && trial.target_count === 2)[1],
+      correctAiPool.filter(trial => trial.system_event === "hit" && trial.target_count === 2)[2]
     ];
   return chosen.map((spec, index) => ({
     ...spec,
@@ -1036,23 +1092,29 @@ form.addEventListener("submit", async event => {
   try {
     const preflight = runPreflight();
     if (!preflight.allPassed) throw new Error("device_not_supported");
+    const clientMeta = {
+      age: participant.age,
+      gender: participant.gender,
+      handedness: participant.handedness,
+      vision: participant.vision,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      language: navigator.language,
+      consent_version: CONSENT_VERSION,
+      consent_accepted_at: consentAcceptedAt,
+      preflight: preflight.checks,
+      device_pixel_ratio: devicePixelRatio
+    };
     session = await startSession({
       subject_code: participant.subject_code,
       consent: participant.consent,
       mode,
-      client_meta: {
-        age: participant.age,
-        gender: participant.gender,
-        handedness: participant.handedness,
-        vision: participant.vision,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        language: navigator.language,
-        consent_version: CONSENT_VERSION,
-        consent_accepted_at: consentAcceptedAt,
-        preflight: preflight.checks,
-        device_pixel_ratio: devicePixelRatio
-      }
+      client_meta: clientMeta
     });
+    session = {
+      ...session,
+      subject_code: participant.subject_code,
+      client_meta: clientMeta
+    };
     installUnloadUpload(() => session?.session_id);
     await launchExperiment();
   } catch (error) {

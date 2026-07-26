@@ -162,4 +162,3 @@ var jsPsychFullscreen = (function (jspsych) {
   return FullscreenPlugin;
 
 })(jsPsychModule);
-//# sourceMappingURL=https://unpkg.com/@jspsych/plugin-fullscreen@2.1.0/dist/index.browser.js.map

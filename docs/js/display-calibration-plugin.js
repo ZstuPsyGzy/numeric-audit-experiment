@@ -33,6 +33,7 @@ export class DisplayCalibrationPlugin {
 
   trial(displayElement) {
     const startedAt = performance.now();
+    const isPilotMode = new URLSearchParams(location.search).get("mode") === "pilot";
     const initialWidth = Math.max(240, Math.min(420, Math.round(innerWidth * 0.32)));
     let referenceWidthPx = initialWidth;
     let redChoice = null;
@@ -92,6 +93,7 @@ export class DisplayCalibrationPlugin {
 
             <div class="calibration-warning" data-color-warning hidden>如果较难区分，请关闭夜间模式并适当调整屏幕亮度。你的选择会被记录，但不会显示正确答案。</div>
             <div class="timeline-actions">
+              <button class="secondary-button" type="button" data-recalibrate-size hidden>返回尺寸校准</button>
               <button class="primary-button" type="button" data-finish-calibration disabled>完成校准</button>
             </div>
           </div>
@@ -106,6 +108,7 @@ export class DisplayCalibrationPlugin {
     const headingStep = displayElement.querySelector(".calibration-heading span");
     const headingTitle = displayElement.querySelector(".calibration-heading h1");
     const finishButton = displayElement.querySelector("[data-finish-calibration]");
+    const recalibrateButton = displayElement.querySelector("[data-recalibrate-size]");
     const colorWarning = displayElement.querySelector("[data-color-warning]");
 
     const renderReference = () => {
@@ -122,12 +125,24 @@ export class DisplayCalibrationPlugin {
       colorStage.hidden = false;
       headingStep.textContent = "显示校准 2 / 2";
       headingTitle.textContent = "颜色与亮度检查";
-    }, { once: true });
+      recalibrateButton.hidden = true;
+      updateReadyState();
+    });
 
     const updateReadyState = () => {
       finishButton.disabled = redChoice === null || grayDistinguishable === null;
       colorWarning.hidden = grayDistinguishable !== false && firstRedChoiceCorrect !== false;
+      recalibrateButton.hidden = true;
     };
+
+    recalibrateButton.addEventListener("click", () => {
+      colorStage.hidden = true;
+      sizeStage.hidden = false;
+      headingStep.textContent = "显示校准 1 / 2";
+      headingTitle.textContent = "尺寸校准";
+      colorWarning.hidden = true;
+      recalibrateButton.hidden = true;
+    });
 
     displayElement.querySelectorAll("[data-red-choice]").forEach(button => {
       button.addEventListener("click", () => {
@@ -156,10 +171,16 @@ export class DisplayCalibrationPlugin {
         innerWidth * MATRIX_VIEWPORT_WIDTH_RATIO,
         innerHeight * MATRIX_VIEWPORT_HEIGHT_RATIO
       );
-      if (requiredMatrixWidthPx > availableMatrixWidthPx) {
+      const sizeCheckPassed = requiredMatrixWidthPx <= availableMatrixWidthPx;
+      if (!sizeCheckPassed && !isPilotMode) {
         colorWarning.hidden = false;
-        colorWarning.textContent = `当前屏幕无法按固定 ${MATRIX_MAX_WIDTH_MM} mm 呈现最大矩阵。请提高屏幕分辨率、将系统显示缩放调整为 100%，然后刷新页面重新校准。`;
+        colorWarning.innerHTML = `<strong>尺寸校准未通过，正式实验暂不能继续。</strong><br>按当前校准结果，最大矩阵需要 ${round(requiredMatrixWidthPx, 0)} px，但当前屏幕可用空间约为 ${round(availableMatrixWidthPx, 0)} px。请返回尺寸校准重新调整，或提高屏幕分辨率、将系统/浏览器缩放调整为 100% 后刷新页面。`;
+        recalibrateButton.hidden = false;
         return;
+      }
+      if (!sizeCheckPassed && isPilotMode) {
+        colorWarning.hidden = false;
+        colorWarning.textContent = `预测试模式：当前屏幕未通过固定 ${MATRIX_MAX_WIDTH_MM} mm 矩阵尺寸检查，但程序将继续，以便测试完整流程。正式实验中该情况会被拦截。`;
       }
       const calibration = {
         trial_kind: "display_calibration",
@@ -172,7 +193,8 @@ export class DisplayCalibrationPlugin {
         fixed_matrix_width_mm: MATRIX_MAX_WIDTH_MM,
         fixed_matrix_required_width_px: round(requiredMatrixWidthPx, 2),
         fixed_matrix_available_width_px: round(availableMatrixWidthPx, 2),
-        fixed_matrix_size_check_passed: true,
+        fixed_matrix_size_check_passed: sizeCheckPassed,
+        fixed_matrix_size_check_bypassed_for_pilot: !sizeCheckPassed && isPilotMode,
         estimated_420px_width_mm: round(420 / pxPerMm, 2),
         deep_red_hex: "#941c24",
         light_red_hex: "#de8d92",
@@ -188,6 +210,6 @@ export class DisplayCalibrationPlugin {
       };
       window.__displayCalibration = calibration;
       this.jsPsych.finishTrial(calibration);
-    }, { once: true });
+    });
   }
 }

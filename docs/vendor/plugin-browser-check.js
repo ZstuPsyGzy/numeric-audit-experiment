@@ -648,4 +648,3 @@ var jsPsychBrowserCheck = (function (jspsych) {
     return BrowserCheckPlugin;
 
 })(jsPsychModule);
-//# sourceMappingURL=https://unpkg.com/@jspsych/plugin-browser-check@2.1.0/dist/index.browser.js.map
