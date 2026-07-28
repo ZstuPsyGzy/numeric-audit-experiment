@@ -68,16 +68,6 @@ export class NumericAuditPlugin {
     let judgmentAt = null;
     let ratingSubmittedAt = null;
     let fixationActualDuration = null;
-    const cueStatusHtml = (() => {
-      if (!spec.ai_present) return "本阶段不提供 AI 分析";
-      const cueItems = [
-        material.deepCue ? '<span><i class="cue-key deep"></i>深红候选</span>' : "",
-        material.lightCue ? '<span><i class="cue-key light"></i>浅红候选</span>' : ""
-      ].filter(Boolean).join("");
-      const label = "AI 分析已完成：已生成候选提示";
-      return `<span class="analysis-done">${label}</span>${cueItems}`;
-    })();
-
     displayElement.innerHTML = `
       <main class="trial-screen">
         <header class="trial-header">
@@ -92,7 +82,6 @@ export class NumericAuditPlugin {
             <div class="matrix-wrap">
               <div class="number-matrix matrix-size-${material.matrixSize}"></div>
             </div>
-            <div class="cue-status">${cueStatusHtml}</div>
           </div>
           <aside class="response-area">
             <section class="response-section response-main">
