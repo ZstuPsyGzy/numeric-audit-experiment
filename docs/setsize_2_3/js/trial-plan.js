@@ -12,33 +12,36 @@ import { createRng, shuffle } from "./rng.js";
 
 const AI_PROFILES = {
   "90_90": {
-    target0: ["both_false_alarm"],
-    target1: ["deep_valid_light_invalid", "deep_invalid_light_valid"],
-    target2: repeat("both_valid_split", 17)
+    target0: repeat("both_false_alarm", 2),
+    target1: [
+      ...repeat("deep_valid_light_invalid", 2),
+      ...repeat("deep_invalid_light_valid", 2)
+    ],
+    target2: repeat("both_valid_split", 34)
   },
   "90_70": {
-    target0: ["both_false_alarm"],
+    target0: repeat("both_false_alarm", 2),
     target1: [
-      ...repeat("deep_valid_light_invalid", 5),
-      "deep_invalid_light_valid"
+      ...repeat("deep_valid_light_invalid", 10),
+      ...repeat("deep_invalid_light_valid", 2)
     ],
-    target2: repeat("both_valid_split", 13)
+    target2: repeat("both_valid_split", 26)
   },
   "70_90": {
-    target0: ["both_false_alarm"],
+    target0: repeat("both_false_alarm", 2),
     target1: [
-      "deep_valid_light_invalid",
-      ...repeat("deep_invalid_light_valid", 5)
+      ...repeat("deep_valid_light_invalid", 2),
+      ...repeat("deep_invalid_light_valid", 10)
     ],
-    target2: repeat("both_valid_split", 13)
+    target2: repeat("both_valid_split", 26)
   },
   "70_70": {
     target0: repeat("both_false_alarm", 2),
     target1: [
-      ...repeat("deep_valid_light_invalid", 4),
-      ...repeat("deep_invalid_light_valid", 4)
+      ...repeat("deep_valid_light_invalid", 10),
+      ...repeat("deep_invalid_light_valid", 10)
     ],
-    target2: repeat("both_valid_split", 10)
+    target2: repeat("both_valid_split", 18)
   }
 };
 
@@ -252,7 +255,7 @@ export function validateTrialPlan(plan = generateCanonicalPlan()) {
         : (row.hit + row.correct_rejection) / cell.length;
       summary.push(row);
 
-      if (cell.length !== TRIALS_PER_CELL) errors.push(`${conditionKey}/S${setSize}: trial 数不是 20`);
+      if (cell.length !== TRIALS_PER_CELL) errors.push(`${conditionKey}/S${setSize}: trial 数不是 ${TRIALS_PER_CELL}`);
       const expectedTargets = TARGET_COUNTS_PER_CELL_BY_CONDITION[conditionKey];
       if (target0 !== expectedTargets[0] || target1 !== expectedTargets[1] || target2 !== expectedTargets[2]) {
         errors.push(`${conditionKey}/S${setSize}: 目标数分布不是 ${expectedTargets[0]}/${expectedTargets[1]}/${expectedTargets[2]}`);
@@ -294,6 +297,6 @@ if (typeof window === "undefined" && process.argv[1]?.endsWith("trial-plan.js"))
     console.error(validation.errors);
     process.exitCode = 1;
   } else {
-    console.log("Trial plan valid: canonical material trials; every AI trial has two cues and no CR/Miss.");
+    console.log("Trial plan valid: canonical material trials; every AI trial has two cues, no CR/Miss, and exact 70/90 cue validity.");
   }
 }

@@ -907,8 +907,8 @@ function buildTimeline(plan, assignment) {
       if (aiConditionComplete) {
         timeline.push({
           type: ExperimentScreenPlugin,
-          title: "当前 AI 条件完成",
-          content: "<div class=\"phase-intro\"><p>已完成当前 AI 条件下三种矩阵规模、共 60 个正式任务。请休息片刻，准备好后进入下一个 AI 条件。</p></div>",
+          title: "当前 AI 辅助任务完成",
+          content: "<div class=\"phase-intro\"><p>已完成当前 AI 辅助任务。请休息片刻，准备好后继续。</p></div>",
           button_label: "休息结束，继续"
         });
       }
