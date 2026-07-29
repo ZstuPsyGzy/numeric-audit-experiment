@@ -41,7 +41,7 @@ function rowsToCsv(rows) {
     "trial_index_global", "trial_index_block", "trial_uuid",
     "participant_judgment", "correct_judgment", "judgment_correct", "fully_correct",
     "localization_rt_ms", "judgment_rt_ms", "judgment_confidence",
-    "ai_output_trust", "deep_validity", "light_validity",
+    "deep_cue_trust", "light_cue_trust", "deep_validity", "light_validity",
     "deep_outcome", "light_outcome", "cue_visual_style", "cue_positions_overlap", "selected_positions", "target_positions",
     "matrix_repetition_score", "matrix_relation_pair_score",
     "matrix_swapped_pair_count", "matrix_shared_digit_total",

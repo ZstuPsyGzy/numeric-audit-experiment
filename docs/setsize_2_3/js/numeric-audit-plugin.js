@@ -315,7 +315,8 @@ export class NumericAuditPlugin {
         instruction_review_count: instructionReviewCount,
         instruction_review_time_ms: round(instructionReviewDuration),
         judgment_confidence: ratings.confidence ?? null,
-        ai_output_trust: ratings.ai_output_trust ?? null,
+        deep_cue_trust: ratings.deep_cue_trust ?? null,
+        light_cue_trust: ratings.light_cue_trust ?? null,
         fullscreen_exit_count_total: window.__fullscreenExitCount || 0,
         visibility_hidden_count_total: window.__visibilityHiddenCount || 0
       });
@@ -356,7 +357,8 @@ export class NumericAuditPlugin {
     const ratingQuestions = [
       { key: "confidence", label: "对本次判断有多确定？" },
       ...(spec.ai_present ? [
-        { key: "ai_output_trust", label: "对本次 AI 分析结果有多信任？" }
+        { key: "deep_cue_trust", label: "对本次深红候选有多信任？" },
+        { key: "light_cue_trust", label: "对本次浅红候选有多信任？" }
       ] : [])
     ];
 
