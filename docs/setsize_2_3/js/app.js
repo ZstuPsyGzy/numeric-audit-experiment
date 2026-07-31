@@ -82,6 +82,11 @@ let browserCheckData = null;
 let consentAccepted = false;
 let consentAcceptedAt = null;
 let exportBundle = null;
+let experimentStartedAt = null;
+let experimentStartedEpochMs = null;
+let experimentStartedPerformanceMs = null;
+let experimentFinishedAt = null;
+let experimentFinishedEpochMs = null;
 window.__fullscreenExitCount = 0;
 window.__visibilityHiddenCount = 0;
 
@@ -91,6 +96,23 @@ if (!planValidation.valid) console.error("Trial plan validation failed", planVal
 
 function randomUuid() {
     return crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function sessionTimingMeta() {
+    const recordEpochMs = Date.now();
+    const elapsedMs = experimentStartedPerformanceMs === null
+        ? null
+        : Math.round(performance.now() - experimentStartedPerformanceMs);
+    return {
+        session_started_at: session?.started_at || null,
+        experiment_started_at: experimentStartedAt,
+        experiment_started_epoch_ms: experimentStartedEpochMs,
+        experiment_finished_at: experimentFinishedAt,
+        experiment_finished_epoch_ms: experimentFinishedEpochMs,
+        record_created_at: new Date(recordEpochMs).toISOString(),
+        record_created_epoch_ms: recordEpochMs,
+        experiment_elapsed_ms_to_record: elapsedMs
+    };
 }
 
 function detectMobile() {
@@ -513,6 +535,7 @@ function prepareNumericTrial(spec, options, assignment) {
 function storeTrialData(data, spec, assignment) {
   const record = {
     ...data,
+    ...sessionTimingMeta(),
     trial_uuid: randomUuid(),
     experiment_version: EXPERIMENT_VERSION,
     mode,
@@ -555,6 +578,7 @@ function storeTrialData(data, spec, assignment) {
 function storeCalibrationData(data, assignment) {
   const record = {
     ...data,
+    ...sessionTimingMeta(),
     trial_uuid: randomUuid(),
     experiment_version: EXPERIMENT_VERSION,
     mode,
@@ -598,7 +622,8 @@ function mean(values) {
 
 function queueRecord(record) {
   try {
-    enqueueTrial(session.session_id, record);
+    const { mouse_trace: _mouseTrace, ...backupRecord } = record;
+    enqueueTrial(session.session_id, backupRecord);
     if (queuedTrialCount(session.session_id) >= UPLOAD_BATCH_SIZE) syncQueue();
   } catch (error) {
     console.error("Data queue failed; timeline continues and upload will be checked at completion.", error);
@@ -645,6 +670,7 @@ function storeQuestionnaireData(data, assignment, context = {}) {
     ...data,
     ...responses,
     ...scoreQuestionnaire(data.questionnaire_id, responses),
+    ...sessionTimingMeta(),
     trial_uuid: randomUuid(),
     experiment_version: EXPERIMENT_VERSION,
     mode,
@@ -969,6 +995,17 @@ function renderCompletion(message, failed = false) {
 async function completeExperiment() {
   renderCompletion("正在生成实验数据文件，请不要关闭页面。");
   try {
+    experimentFinishedEpochMs = Date.now();
+    experimentFinishedAt = new Date(experimentFinishedEpochMs).toISOString();
+    if (session) {
+      session.experiment_started_at = experimentStartedAt;
+      session.experiment_started_epoch_ms = experimentStartedEpochMs;
+      session.experiment_finished_at = experimentFinishedAt;
+      session.experiment_finished_epoch_ms = experimentFinishedEpochMs;
+      session.experiment_total_wall_time_ms = experimentStartedEpochMs === null
+        ? null
+        : experimentFinishedEpochMs - experimentStartedEpochMs;
+    }
     await finishSession(session.session_id).catch(error => {
       console.warn("Server upload unavailable; exporting local data instead.", error);
     });
@@ -988,6 +1025,13 @@ async function completeExperiment() {
 async function launchExperiment() {
   const assignment = session.assignment;
   const plan = buildParticipantPlan(assignment, mode);
+  experimentStartedEpochMs = Date.now();
+  experimentStartedAt = new Date(experimentStartedEpochMs).toISOString();
+  experimentStartedPerformanceMs = performance.now();
+  experimentFinishedAt = null;
+  experimentFinishedEpochMs = null;
+  session.experiment_started_at = experimentStartedAt;
+  session.experiment_started_epoch_ms = experimentStartedEpochMs;
   const jsPsych = window.initJsPsych({
     display_element: jsPsychTarget,
     on_finish: completeExperiment,

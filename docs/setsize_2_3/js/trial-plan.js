@@ -189,6 +189,17 @@ function blockTrials(canonical, phase, conditionKey, setSize) {
   );
 }
 
+function presentationSeed(assignment, phase, conditionKey, setSize, mode) {
+  const subjectPart = [
+    assignment.allocation_method,
+    assignment.assignment_group,
+    assignment.assignment_cycle,
+    assignment.subject_sequence ?? "preview",
+    assignment.set_size_order_index
+  ].join("-");
+  return `${MATERIAL_SEED}:presentation:${mode}:${subjectPart}:${phase}:${conditionKey}:s${setSize}`;
+}
+
 export function buildParticipantPlan(assignment = DEFAULT_ASSIGNMENT, mode = "formal") {
   const canonical = generateCanonicalPlan();
   const ordered = [];
@@ -200,10 +211,19 @@ export function buildParticipantPlan(assignment = DEFAULT_ASSIGNMENT, mode = "fo
         blockIndex += 1;
         const block = blockTrials(canonical, phase, conditionKey, setSize);
         const selected = mode === "pilot" ? block.slice(0, PILOT_TRIALS_PER_BLOCK) : block;
-        selected.forEach((trial, trialIndexBlock) => ordered.push({
+        const seed = presentationSeed(assignment, phase, conditionKey, setSize, mode);
+        const randomized = shuffle(
+          selected.map((trial, canonicalIndexBlock) => ({
+            ...trial,
+            canonical_order_in_block: canonicalIndexBlock + 1
+          })),
+          createRng(seed)
+        );
+        randomized.forEach((trial, trialIndexBlock) => ordered.push({
           ...trial,
           block_index: blockIndex,
-          trial_index_block: trialIndexBlock + 1
+          trial_index_block: trialIndexBlock + 1,
+          presentation_order_seed: seed
         }));
       }
     }

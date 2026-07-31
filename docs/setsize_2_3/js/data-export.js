@@ -30,19 +30,42 @@ function escapeCsv(value) {
 }
 
 function rowsToCsv(rows) {
+  const csvRows = rows.map(row => {
+    const { mouse_trace: _mouseTrace, ...csvRow } = row;
+    return csvRow;
+  });
   const preferred = [
     "subject_code", "session_id", "experiment_version", "mode", "phase",
+    "session_started_at", "experiment_started_at", "experiment_started_epoch_ms",
+    "experiment_finished_at", "experiment_finished_epoch_ms",
+    "experiment_total_wall_time_ms",
+    "record_created_at", "record_created_epoch_ms", "experiment_elapsed_ms_to_record",
     "condition_key", "matrix_id", "canonical_id", "material_seed",
     "calibration_method", "calibration_reference",
     "calibration_reference_width_mm", "calibration_reference_height_mm",
     "calibration_reference_width_px", "px_per_mm",
     "red_discrimination_correct", "gray_bands_distinguishable",
     "set_size", "target_count", "target_present", "block_index", "block_position", "block_count", "block_trial_count",
-    "trial_index_global", "trial_index_block", "trial_uuid",
+    "trial_index_global", "trial_index_block", "canonical_order_in_block", "presentation_order_seed", "trial_uuid",
     "participant_judgment", "correct_judgment", "judgment_correct", "fully_correct",
-    "localization_rt_ms", "judgment_rt_ms", "judgment_confidence",
+    "trial_started_at", "trial_started_epoch_ms", "response_completed_at", "response_completed_epoch_ms",
+    "trial_finished_at", "trial_finished_epoch_ms", "trial_wall_time_ms",
+    "first_click_rt_ms", "last_click_rt_ms", "last_selection_rt_ms",
+    "localization_rt_ms", "post_localization_judgment_rt_ms", "judgment_rt_ms",
+    "rating_rt_ms", "total_rt_ms", "judgment_confidence",
     "deep_cue_trust", "light_cue_trust", "deep_validity", "light_validity",
-    "deep_outcome", "light_outcome", "cue_visual_style", "cue_positions_overlap", "selected_positions", "target_positions",
+    "deep_outcome", "light_outcome", "cue_profile", "system_event",
+    "deep_cue_selected_final", "light_cue_selected_final",
+    "deep_cue_first_select_rt_ms", "light_cue_first_select_rt_ms",
+    "deep_cue_first_select_order", "light_cue_first_select_order",
+    "first_click_cue_membership", "first_click_was_target",
+    "true_positive_clicks", "false_positive_clicks", "target_recall", "click_precision",
+    "mouse_tracking_scope", "mouse_trace_storage", "mouse_sample_interval_ms", "mouse_sample_count", "mouse_distance_px",
+    "mouse_first_matrix_entry_rt_ms", "mouse_deep_first_entry_rt_ms", "mouse_light_first_entry_rt_ms",
+    "mouse_deep_motion_sample_count", "mouse_light_motion_sample_count",
+    "mouse_deep_hover_count", "mouse_light_hover_count",
+    "mouse_deep_hover_duration_ms", "mouse_light_hover_duration_ms",
+    "cue_visual_style", "cue_positions_overlap", "selected_positions", "target_positions",
     "matrix_repetition_score", "matrix_relation_pair_score",
     "matrix_swapped_pair_count", "matrix_shared_digit_total",
     "matrix_rendered_width_px", "matrix_rendered_height_px",
@@ -63,20 +86,29 @@ function rowsToCsv(rows) {
     "ai_literacy_awareness_mean", "ai_literacy_usage_mean", "ai_literacy_evaluation_mean",
     "ai_literacy_ethics_mean", "ai_literacy_total_mean"
   ];
-  const allKeys = new Set(rows.flatMap(row => Object.keys(row)));
+  const allKeys = new Set(csvRows.flatMap(row => Object.keys(row)));
   const headers = [
     ...preferred.filter(key => allKeys.has(key)),
     ...[...allKeys].filter(key => !preferred.includes(key)).sort()
   ];
   const lines = [headers.map(escapeCsv).join(",")];
-  for (const row of rows) {
+  for (const row of csvRows) {
     lines.push(headers.map(key => escapeCsv(row[key])).join(","));
   }
   return `\uFEFF${lines.join("\r\n")}`;
 }
 
 export function createExportBundle(jsPsych, session) {
-  const rows = jsPsych?.data?.get().values() || [];
+  const rawRows = jsPsych?.data?.get().values() || [];
+  const rows = rawRows.map(row => ({
+    ...row,
+    session_started_at: row.session_started_at || session?.started_at || null,
+    experiment_started_at: row.experiment_started_at || session?.experiment_started_at || null,
+    experiment_started_epoch_ms: row.experiment_started_epoch_ms || session?.experiment_started_epoch_ms || null,
+    experiment_finished_at: row.experiment_finished_at || session?.experiment_finished_at || null,
+    experiment_finished_epoch_ms: row.experiment_finished_epoch_ms || session?.experiment_finished_epoch_ms || null,
+    experiment_total_wall_time_ms: session?.experiment_total_wall_time_ms ?? null
+  }));
   const exportedAt = new Date();
   const baseName = [
     "numeric-audit",

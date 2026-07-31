@@ -26,6 +26,7 @@ export async function startSession(payload) {
   const session = {
     session_id: sessionId(payload.subject_code),
     subject_code: payload.subject_code,
+    started_at: new Date().toISOString(),
     client_meta: payload.client_meta || {},
     assignment
   };

@@ -3,6 +3,8 @@ import { CUE_VISUAL_STYLE, MATRIX_GAP_MM, MATRIX_MAX_WIDTH_MM } from "./config.j
 const { ParameterType } = window.jsPsychModule;
 const MAX_DISPLAY_MATRIX_SIZE = 5;
 const CSS_PX_PER_MM = 96 / 25.4;
+const MOUSE_SAMPLE_INTERVAL_MS = 50;
+const MOUSE_MIN_MOVE_PX = 3;
 
 function keyOf(position) {
   return `${position.row},${position.col}`;
@@ -50,6 +52,8 @@ export class NumericAuditPlugin {
   trial(displayElement, trial) {
     const { spec, material } = trial;
     const startedAt = performance.now();
+    const trialStartedEpochMs = Date.now();
+    const trialStartedAt = new Date(trialStartedEpochMs).toISOString();
     let pausedDuration = 0;
     let instructionReviewStartedAt = null;
     let instructionReviewCount = 0;
@@ -63,11 +67,43 @@ export class NumericAuditPlugin {
     const targetKeys = new Set(material.targetPositions.map(keyOf));
     const selected = new Map();
     const clickTrace = [];
+    const mouseTrace = [];
     const ratings = {};
     let judgment = null;
     let judgmentAt = null;
+    let responseCompletedEpochMs = null;
     let ratingSubmittedAt = null;
     let fixationActualDuration = null;
+    let mouseTrackingActive = true;
+    let lastMouseSampleAt = -Infinity;
+    let lastMousePoint = null;
+    let mouseDistancePx = 0;
+    let mouseFirstMatrixEntryRt = null;
+    let mouseDeepFirstEntryRt = null;
+    let mouseLightFirstEntryRt = null;
+    let mouseDeepSampleCount = 0;
+    let mouseLightSampleCount = 0;
+    const cueHoverStartedAt = { deep: null, light: null };
+    const cueHoverDuration = { deep: 0, light: 0 };
+    const cueHoverCount = { deep: 0, light: 0 };
+
+    const startCueHover = cue => {
+      if (!mouseTrackingActive || cueHoverStartedAt[cue] !== null) return;
+      const rt = activeElapsed();
+      cueHoverStartedAt[cue] = rt;
+      cueHoverCount[cue] += 1;
+      if (cue === "deep" && mouseDeepFirstEntryRt === null) mouseDeepFirstEntryRt = rt;
+      if (cue === "light" && mouseLightFirstEntryRt === null) mouseLightFirstEntryRt = rt;
+    };
+    const endCueHover = cue => {
+      if (cueHoverStartedAt[cue] === null) return;
+      cueHoverDuration[cue] += Math.max(0, activeElapsed() - cueHoverStartedAt[cue]);
+      cueHoverStartedAt[cue] = null;
+    };
+    const closeOpenCueHovers = () => {
+      endCueHover("deep");
+      endCueHover("light");
+    };
     displayElement.innerHTML = `
       <main class="trial-screen">
         <header class="trial-header">
@@ -178,6 +214,14 @@ export class NumericAuditPlugin {
       if (spec.ai_present && material.lightCue?.row === rowIndex && material.lightCue?.col === colIndex) {
         button.classList.add("cue-light");
       }
+      if (button.classList.contains("cue-deep")) {
+        button.addEventListener("pointerenter", () => startCueHover("deep"));
+        button.addEventListener("pointerleave", () => endCueHover("deep"));
+      }
+      if (button.classList.contains("cue-light")) {
+        button.addEventListener("pointerenter", () => startCueHover("light"));
+        button.addEventListener("pointerleave", () => endCueHover("light"));
+      }
       if (selectable) button.addEventListener("click", () => {
         const position = { row: rowIndex, col: colIndex };
         const key = keyOf(position);
@@ -240,8 +284,66 @@ export class NumericAuditPlugin {
       display_gray_bands_distinguishable: window.__displayCalibration?.gray_bands_distinguishable ?? null
     };
 
+    const onPointerMove = event => {
+      if (!mouseTrackingActive || instructionReviewStartedAt !== null) return;
+      const rt = activeElapsed();
+      if (rt - lastMouseSampleAt < MOUSE_SAMPLE_INTERVAL_MS) return;
+      const point = { x: event.clientX, y: event.clientY };
+      if (lastMousePoint) {
+        const distance = Math.hypot(point.x - lastMousePoint.x, point.y - lastMousePoint.y);
+        if (distance < MOUSE_MIN_MOVE_PX) return;
+        mouseDistancePx += distance;
+      }
+      lastMouseSampleAt = rt;
+      lastMousePoint = point;
+
+      const currentMatrixRect = matrixElement.getBoundingClientRect();
+      const insideMatrix = point.x >= currentMatrixRect.left
+        && point.x <= currentMatrixRect.right
+        && point.y >= currentMatrixRect.top
+        && point.y <= currentMatrixRect.bottom;
+      const cell = event.target.closest?.(".number-cell");
+      const row = cell ? Number(cell.dataset.row) : null;
+      const col = cell ? Number(cell.dataset.col) : null;
+      const position = Number.isInteger(row) && Number.isInteger(col) ? { row, col } : null;
+      const membership = position ? cueMembership(position, material) : "none";
+
+      if (insideMatrix && mouseFirstMatrixEntryRt === null) mouseFirstMatrixEntryRt = rt;
+      if ((membership === "deep" || membership === "deep_and_light") && mouseDeepFirstEntryRt === null) {
+        mouseDeepFirstEntryRt = rt;
+      }
+      if ((membership === "light" || membership === "deep_and_light") && mouseLightFirstEntryRt === null) {
+        mouseLightFirstEntryRt = rt;
+      }
+      if (membership === "deep" || membership === "deep_and_light") mouseDeepSampleCount += 1;
+      if (membership === "light" || membership === "deep_and_light") mouseLightSampleCount += 1;
+
+      mouseTrace.push({
+        order: mouseTrace.length + 1,
+        rt_ms: round(rt),
+        viewport_x_px: round(point.x),
+        viewport_y_px: round(point.y),
+        matrix_x_px: insideMatrix ? round(point.x - currentMatrixRect.left) : null,
+        matrix_y_px: insideMatrix ? round(point.y - currentMatrixRect.top) : null,
+        matrix_x_norm: insideMatrix ? round((point.x - currentMatrixRect.left) / currentMatrixRect.width) : null,
+        matrix_y_norm: insideMatrix ? round((point.y - currentMatrixRect.top) / currentMatrixRect.height) : null,
+        inside_matrix: insideMatrix,
+        row,
+        col,
+        selectable: Boolean(cell?.classList.contains("selectable")),
+        is_target: position ? targetKeys.has(keyOf(position)) : null,
+        cue_membership: membership,
+        pointer_type: event.pointerType || "mouse"
+      });
+    };
+    trialScreen.addEventListener("pointermove", onPointerMove, { passive: true });
+
     const finish = (responseEndedAt = activeElapsed()) => {
       const endedAt = responseEndedAt;
+      const trialFinishedEpochMs = Date.now();
+      if (responseCompletedEpochMs === null) responseCompletedEpochMs = trialFinishedEpochMs;
+      mouseTrackingActive = false;
+      trialScreen.removeEventListener("pointermove", onPointerMove);
       const selectedPositions = [...selected.values()];
       const selectedKeys = new Set(selectedPositions.map(keyOf));
       const truePositiveClicks = selectedPositions.filter(position => targetKeys.has(keyOf(position))).length;
@@ -252,6 +354,17 @@ export class NumericAuditPlugin {
       const firstClickedPosition = firstSelection
         ? { row: firstSelection.row, col: firstSelection.col }
         : null;
+      const selectionEvents = clickTrace.filter(click => click.action === "select");
+      const lastSelection = selectionEvents.at(-1) ?? null;
+      const lastClick = clickTrace.at(-1) ?? null;
+      const firstDeepSelection = selectionEvents.find(click =>
+        click.cue_membership === "deep" || click.cue_membership === "deep_and_light"
+      );
+      const firstLightSelection = selectionEvents.find(click =>
+        click.cue_membership === "light" || click.cue_membership === "deep_and_light"
+      );
+      const deepCueKey = material.deepCue ? keyOf(material.deepCue) : null;
+      const lightCueKey = material.lightCue ? keyOf(material.lightCue) : null;
       this.jsPsych.finishTrial({
         trial_kind: "numeric_audit",
         practice: trial.practice,
@@ -261,6 +374,8 @@ export class NumericAuditPlugin {
         condition_key: spec.condition_key,
         trial_index_global: spec.trial_index_global ?? null,
         trial_index_block: spec.trial_index_block ?? null,
+        canonical_order_in_block: spec.canonical_order_in_block ?? null,
+        presentation_order_seed: spec.presentation_order_seed ?? null,
         block_index: spec.block_index ?? null,
         set_size: spec.set_size,
         matrix_size: spec.matrix_size,
@@ -302,12 +417,44 @@ export class NumericAuditPlugin {
         target_recall: spec.target_count ? truePositiveClicks / spec.target_count : null,
         click_precision: selectedPositions.length ? truePositiveClicks / selectedPositions.length : null,
         click_trace: clickTrace,
+        trial_started_at: trialStartedAt,
+        trial_started_epoch_ms: trialStartedEpochMs,
+        response_completed_at: new Date(responseCompletedEpochMs).toISOString(),
+        response_completed_epoch_ms: responseCompletedEpochMs,
+        trial_finished_at: new Date(trialFinishedEpochMs).toISOString(),
+        trial_finished_epoch_ms: trialFinishedEpochMs,
+        trial_wall_time_ms: trialFinishedEpochMs - trialStartedEpochMs,
         first_clicked_position: firstClickedPosition,
         first_click_cue_membership: firstSelection?.cue_membership ?? "none",
         first_click_was_target: firstSelection?.is_target ?? null,
         first_click_rt_ms: firstSelection?.rt_ms ?? null,
-        localization_rt_ms: round(judgmentAt),
+        last_click_rt_ms: lastClick?.rt_ms ?? null,
+        last_selection_rt_ms: lastSelection?.rt_ms ?? null,
+        localization_rt_ms: lastClick?.rt_ms ?? null,
+        post_localization_judgment_rt_ms: lastClick ? round(judgmentAt - lastClick.rt_ms) : null,
         judgment_rt_ms: round(judgmentAt),
+        deep_cue_selected_final: deepCueKey ? selectedKeys.has(deepCueKey) : null,
+        light_cue_selected_final: lightCueKey ? selectedKeys.has(lightCueKey) : null,
+        deep_cue_first_select_rt_ms: firstDeepSelection?.rt_ms ?? null,
+        light_cue_first_select_rt_ms: firstLightSelection?.rt_ms ?? null,
+        deep_cue_first_select_order: firstDeepSelection?.order ?? null,
+        light_cue_first_select_order: firstLightSelection?.order ?? null,
+        mouse_tracking_scope: "matrix_onset_to_final_judgment",
+        mouse_trace_storage: "final_json_only",
+        mouse_sample_interval_ms: MOUSE_SAMPLE_INTERVAL_MS,
+        mouse_min_move_px: MOUSE_MIN_MOVE_PX,
+        mouse_sample_count: mouseTrace.length,
+        mouse_distance_px: round(mouseDistancePx),
+        mouse_first_matrix_entry_rt_ms: mouseFirstMatrixEntryRt === null ? null : round(mouseFirstMatrixEntryRt),
+        mouse_deep_first_entry_rt_ms: mouseDeepFirstEntryRt === null ? null : round(mouseDeepFirstEntryRt),
+        mouse_light_first_entry_rt_ms: mouseLightFirstEntryRt === null ? null : round(mouseLightFirstEntryRt),
+        mouse_deep_motion_sample_count: mouseDeepSampleCount,
+        mouse_light_motion_sample_count: mouseLightSampleCount,
+        mouse_deep_hover_count: cueHoverCount.deep,
+        mouse_light_hover_count: cueHoverCount.light,
+        mouse_deep_hover_duration_ms: round(cueHoverDuration.deep),
+        mouse_light_hover_duration_ms: round(cueHoverDuration.light),
+        mouse_trace: mouseTrace,
         rating_rt_ms: trial.ask_ratings && ratingSubmittedAt !== null ? round(ratingSubmittedAt - judgmentAt) : null,
         total_rt_ms: round(endedAt),
         fixation_planned_ms: 500,
@@ -324,6 +471,7 @@ export class NumericAuditPlugin {
 
     const showFixationThenFinish = () => {
       const responseEndedAt = activeElapsed();
+      responseCompletedEpochMs = Date.now();
       fixationOverlay.hidden = false;
       const fixationStartedAt = performance.now();
       window.setTimeout(() => {
@@ -406,6 +554,8 @@ export class NumericAuditPlugin {
         }
         judgment = value;
         judgmentAt = activeElapsed();
+        closeOpenCueHovers();
+        mouseTrackingActive = false;
         if (trial.ask_ratings) showRatings();
         else if (trial.practice) showFeedback();
         else showFixationThenFinish();
