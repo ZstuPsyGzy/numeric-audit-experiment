@@ -365,7 +365,7 @@ function taskIntroductionContent() {
       <section>
         <h2>二、怎么反应</h2>
         <ol class="task-response-steps">
-          <li><span>1</span><p>如果发现目标，先点击目标位置；如果发现多个目标，要点击全部目标。</p></li>
+          <li><span>1</span><p>每张矩阵可能没有目标，也可能有<strong class="key-emphasis">一个或两个目标</strong>。如果发现目标，先点击目标位置；如果发现多个目标，要点击全部目标。</p></li>
           <li><span>2</span><p>点击完目标后，再判断整张矩阵是<strong class="key-emphasis">“合规”</strong>还是<strong class="key-emphasis">“不合规”</strong>。</p></li>
           <li><span>3</span><p>如果没有发现目标，不点击任何位置，直接选择<strong class="key-emphasis">“合规”</strong>。</p></li>
         </ol>
