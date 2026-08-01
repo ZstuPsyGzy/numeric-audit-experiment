@@ -1,4 +1,4 @@
-export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.54-setsize-2-3-30trial";
+export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.55-setsize-2-3-30trial";
 export const MATERIAL_SEED = "numeric-audit-material-v5-relation-pair-optimized-fixed-for-all-participants";
 export const CUE_VISUAL_STYLE = "cell_background_tint_v4_manual_b93f4a_e6a0a8";
 export const SET_SIZES = [2, 3];

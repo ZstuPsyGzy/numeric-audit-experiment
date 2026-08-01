@@ -227,11 +227,11 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
 .response-demo-cell { display: grid; place-items: center; min-width: 0; min-height: 0; border: 1px solid transparent; color: #111; font-size: 20.4px; font-weight: 750; line-height: 1; }
 .response-demo-cell.reference { color: #5f6870; background: #eef1f3; }
 .response-demo-cell.audit { border-color: rgba(57, 65, 72, .14); background: rgba(57, 65, 72, .08); }
-.response-demo-cell.demo-target { border-color: var(--red); background: #fff2f3; color: var(--red); animation: responseTargetPulse 4.8s ease-in-out infinite; }
+.response-demo-cell.demo-target { position: relative; animation: responseSelectedCell 4.8s ease-in-out infinite; }
+.response-demo-cell.demo-target::after { content: "✓"; position: absolute; right: 3px; bottom: 2px; color: var(--blue); font-size: 12px; opacity: 0; animation: responseSelectedCheck 4.8s ease-in-out infinite; }
 .demo-pointer { position: absolute; left: 50%; top: 42px; width: 18px; height: 18px; border-right: 4px solid #1f2933; border-bottom: 4px solid #1f2933; rotate: -45deg; transform-origin: center; filter: drop-shadow(0 2px 2px rgba(0,0,0,.16)); }
 .compliant-demo .demo-pointer { animation: compliantPointer 4.8s ease-in-out infinite; }
 .invalid-demo .demo-pointer { animation: invalidPointer 4.8s ease-in-out infinite; }
-.demo-selected-mark { position: absolute; left: calc(50% - 56px); top: 54px; padding: 3px 6px; border: 1px solid var(--red); background: #fff; color: var(--red); font-size: 12px; font-weight: 800; opacity: 0; animation: selectedMark 4.8s ease-in-out infinite; }
 .demo-response-buttons { position: absolute; left: 22px; right: 22px; bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .demo-response-button { min-height: 46px; display: grid; place-items: center; border: 2px solid #cbd2d8; border-radius: 5px; background: #fff; color: #151a1f; font-size: 17px; font-weight: 800; }
 .compliant-demo .demo-compliant-button { animation: compliantButton 4.8s ease-in-out infinite; }
@@ -250,15 +250,15 @@ input:focus, select:focus { outline: 3px solid #cfe4f4; border-color: var(--blue
   78%, 92% { translate: 78px 176px; opacity: 1; }
   100% { translate: 78px 176px; opacity: 0; }
 }
-@keyframes responseTargetPulse {
-  0%, 30% { box-shadow: none; }
-  42%, 72% { box-shadow: 0 0 0 5px rgba(167, 25, 32, .14); }
-  100% { box-shadow: none; }
+@keyframes responseSelectedCell {
+  0%, 39% { border-color: rgba(57, 65, 72, .14); background: rgba(57, 65, 72, .08); color: #111; }
+  46%, 82% { border-color: var(--blue); background: var(--blue-soft); color: #111; }
+  100% { border-color: rgba(57, 65, 72, .14); background: rgba(57, 65, 72, .08); color: #111; }
 }
-@keyframes selectedMark {
-  0%, 39% { opacity: 0; transform: translateY(4px); }
-  46%, 80% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(0); }
+@keyframes responseSelectedCheck {
+  0%, 39% { opacity: 0; }
+  46%, 82% { opacity: 1; }
+  100% { opacity: 0; }
 }
 @keyframes compliantButton {
   0%, 73% { border-color: #cbd2d8; background: #fff; }

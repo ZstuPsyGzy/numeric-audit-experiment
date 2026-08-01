@@ -290,7 +290,6 @@ function responseAnimationDemos() {
       <div class="response-demo-stage">
         ${responseDemoMatrix("invalid")}
         <i class="demo-pointer" aria-hidden="true"></i>
-        <span class="demo-selected-mark" aria-hidden="true">已选</span>
         <div class="demo-response-buttons">
           <span class="demo-response-button">合规</span>
           <span class="demo-response-button demo-invalid-button">不合规</span>
