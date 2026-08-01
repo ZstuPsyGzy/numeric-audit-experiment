@@ -1,4 +1,4 @@
-export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.51-setsize-2-3-session-timestamps";
+export const EXPERIMENT_VERSION = "numeric-audit-cue-validity-1.10.54-setsize-2-3-30trial";
 export const MATERIAL_SEED = "numeric-audit-material-v5-relation-pair-optimized-fixed-for-all-participants";
 export const CUE_VISUAL_STYLE = "cell_background_tint_v4_manual_b93f4a_e6a0a8";
 export const SET_SIZES = [2, 3];
@@ -6,13 +6,13 @@ export const MATRIX_GAP_MM = 1.5;
 export const MATRIX_MAX_WIDTH_MM = 135;
 export const MATRIX_VIEWPORT_WIDTH_RATIO = 0.86;
 export const MATRIX_VIEWPORT_HEIGHT_RATIO = 0.64;
-export const TRIALS_PER_CELL = 40;
+export const TRIALS_PER_CELL = 30;
 export const TARGET_COUNTS_PER_CELL_BY_CONDITION = {
-  baseline: { 0: 2, 1: 12, 2: 26 },
-  "90_90": { 0: 2, 1: 4, 2: 34 },
-  "90_70": { 0: 2, 1: 12, 2: 26 },
-  "70_90": { 0: 2, 1: 12, 2: 26 },
-  "70_70": { 0: 2, 1: 20, 2: 18 }
+  baseline: { 0: 1, 1: 10, 2: 19 },
+  "90_90": { 0: 1, 1: 4, 2: 25 },
+  "90_70": { 0: 1, 1: 10, 2: 19 },
+  "70_90": { 0: 1, 1: 10, 2: 19 },
+  "70_70": { 0: 2, 1: 14, 2: 14 }
 };
 export const PILOT_TRIALS_PER_BLOCK = 2;
 export const UPLOAD_BATCH_SIZE = 5;

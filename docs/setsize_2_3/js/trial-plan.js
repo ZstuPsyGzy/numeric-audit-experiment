@@ -12,36 +12,36 @@ import { createRng, shuffle } from "./rng.js";
 
 const AI_PROFILES = {
   "90_90": {
-    target0: repeat("both_false_alarm", 2),
+    target0: repeat("both_false_alarm", 1),
     target1: [
       ...repeat("deep_valid_light_invalid", 2),
       ...repeat("deep_invalid_light_valid", 2)
     ],
-    target2: repeat("both_valid_split", 34)
+    target2: repeat("both_valid_split", 25)
   },
   "90_70": {
-    target0: repeat("both_false_alarm", 2),
+    target0: repeat("both_false_alarm", 1),
     target1: [
-      ...repeat("deep_valid_light_invalid", 10),
+      ...repeat("deep_valid_light_invalid", 8),
       ...repeat("deep_invalid_light_valid", 2)
     ],
-    target2: repeat("both_valid_split", 26)
+    target2: repeat("both_valid_split", 19)
   },
   "70_90": {
-    target0: repeat("both_false_alarm", 2),
+    target0: repeat("both_false_alarm", 1),
     target1: [
       ...repeat("deep_valid_light_invalid", 2),
-      ...repeat("deep_invalid_light_valid", 10)
+      ...repeat("deep_invalid_light_valid", 8)
     ],
-    target2: repeat("both_valid_split", 26)
+    target2: repeat("both_valid_split", 19)
   },
   "70_70": {
     target0: repeat("both_false_alarm", 2),
     target1: [
-      ...repeat("deep_valid_light_invalid", 10),
-      ...repeat("deep_invalid_light_valid", 10)
+      ...repeat("deep_valid_light_invalid", 7),
+      ...repeat("deep_invalid_light_valid", 7)
     ],
-    target2: repeat("both_valid_split", 18)
+    target2: repeat("both_valid_split", 14)
   }
 };
 

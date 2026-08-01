@@ -248,6 +248,59 @@ function instructionMatrixExample() {
     return `<div class="instruction-matrix" aria-label="数字矩阵，内部位置可以点击核查">${cells}</div>`;
 }
 
+function responseDemoMatrix(type) {
+    const values = type === "invalid" ? [
+        [5, 7, 6, 5],
+        [4, 5, 5, 6],
+        [6, 5, 5, 4],
+        [5, 6, 4, 5]
+    ] : [
+        [5, 4, 6, 5],
+        [4, 5, 5, 6],
+        [6, 5, 5, 4],
+        [5, 6, 4, 5]
+    ];
+    const cells = values.flatMap((row, rowIndex) => row.map((value, colIndex) => {
+        const classes = ["response-demo-cell"];
+        const isAudit = rowIndex > 0 && rowIndex < 3 && colIndex > 0 && colIndex < 3;
+        if (isAudit) classes.push("audit");
+        else classes.push("reference");
+        if (type === "invalid" && rowIndex === 1 && colIndex === 1) classes.push("demo-target");
+        return `<span class="${classes.join(" ")}">${value}</span>`;
+    })).join("");
+    return `<div class="response-demo-matrix">${cells}</div>`;
+}
+
+function responseAnimationDemos() {
+    return `<div class="response-demo-strip" aria-label="合规和不合规作答动图示意">
+    <section class="response-demo-card compliant-demo">
+      <h3>合规：没有发现目标</h3>
+      <div class="response-demo-stage">
+        ${responseDemoMatrix("valid")}
+        <i class="demo-pointer" aria-hidden="true"></i>
+        <div class="demo-response-buttons">
+          <span class="demo-response-button demo-compliant-button">合规</span>
+          <span class="demo-response-button">不合规</span>
+        </div>
+      </div>
+      <p>核查后没有发现目标，<strong class="key-emphasis">不点击任何位置</strong>，最后选择<strong class="key-emphasis">合规</strong>。</p>
+    </section>
+    <section class="response-demo-card invalid-demo">
+      <h3>不合规：发现一个目标</h3>
+      <div class="response-demo-stage">
+        ${responseDemoMatrix("invalid")}
+        <i class="demo-pointer" aria-hidden="true"></i>
+        <span class="demo-selected-mark" aria-hidden="true">已选</span>
+        <div class="demo-response-buttons">
+          <span class="demo-response-button">合规</span>
+          <span class="demo-response-button demo-invalid-button">不合规</span>
+        </div>
+      </div>
+      <p>发现目标后，先<strong class="key-emphasis">点击该位置</strong>进行标记，最后选择<strong class="key-emphasis">不合规</strong>。</p>
+    </section>
+  </div>`;
+}
+
 function auditAreaMiniMatrix(effectiveSize) {
     const material = generateTrialMaterial({
         set_size: effectiveSize,
@@ -329,7 +382,7 @@ function taskIntroductionContent() {
 
 function experimentFlowContent() {
     return `<div class="experiment-flow-overview">
-    <p class="instruction-lead">整个实验将按照以下顺序进行，预计需要约 60–75 分钟。每组任务之间可以短暂休息。</p>
+    <p class="instruction-lead">整个实验将按照以下顺序进行，预计需要约 50–60 分钟。每组任务之间可以短暂休息。</p>
     <ol class="experiment-flow-grid">
       <li><span class="flow-index">1</span><div><strong>学习任务规则</strong><p>认真学习任务规则，通过理解检查。</p></div></li>
       <li><span class="flow-index">2</span><div><strong>显示与尺寸校准</strong><p>进入全屏模式，完成颜色辨认和屏幕尺寸校准。</p></div></li>
@@ -360,7 +413,8 @@ function taskRuleVisualContent() {
         <li><span>3</span><p>完成搜索后，判断整张矩阵是<strong class="key-emphasis">合规</strong>还是<strong class="key-emphasis">不合规</strong>。</p></li>
       </ol>
     </section>
-  </div>`;
+  </div>
+  ${responseAnimationDemos()}`;
 }
 
 function aiRoleInstructionContent() {
@@ -385,7 +439,6 @@ function aiRoleInstructionContent() {
       <div><strong>AI 不做什么</strong><p>不直接告诉您整张矩阵合规或不合规。</p></div>
       <div><strong>您需要做什么</strong><p>根据上下左右关系规则核查，并完成最终判断。</p></div>
     </section>
-    <div class="ai-boundary-note"><strong>候选只是辅助信息</strong><p>候选可能正确，也可能标在<strong class="key-emphasis">正常位置</strong>上；请仍然根据上下左右关系规则完成核查和最终判断。</p></div>
   </div>`;
 }
 
@@ -456,7 +509,6 @@ function aiReliabilityInstructionContent(spec) {
         <p>每 10 次浅红候选中，约 ${Math.round(spec.light_validity * 10)} 次位于真实目标位置。</p>
       </div>
     </div>
-    <div class="ai-boundary-note"><strong>仍需自行核查</strong><p>历史正确率不代表当前候选一定正确，也不直接表示整张矩阵是否<strong class="key-emphasis">合规</strong>。请结合上下左右关系规则完成最终判断。</p></div>
   </div>`;
 }
 
